@@ -1,10 +1,11 @@
 // Roster Management Module
 const RosterManager = (function() {
+  
   // Private variables
   const STORAGE_KEY = 'goalTracker_roster';
   let roster = [];
 
-  // Private methods
+  // Save roster to local storage
   function saveRoster() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(roster));
@@ -12,7 +13,7 @@ const RosterManager = (function() {
       console.error('Error saving roster:', error);
     }
   }
-
+  // Load roster from local storage
   function loadRoster() {
     try {
       const savedRoster = JSON.parse(localStorage.getItem(STORAGE_KEY));
@@ -22,7 +23,7 @@ const RosterManager = (function() {
       return getDefaultRoster();
     }
   }
-
+  // Set a default roster if not roster is stored
   function getDefaultRoster() {
     return [
       'Player1', 'Player2'
@@ -74,8 +75,8 @@ const RosterManager = (function() {
         }
 
         // Reinitialize Materialize selects
-        M.FormSelect.init(goalScorerSelect);
-        M.FormSelect.init(goalAssistSelect);
+        // M.FormSelect.init(goalScorerSelect);
+        // M.FormSelect.init(goalAssistSelect);
       }
     },
 
