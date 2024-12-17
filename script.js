@@ -133,18 +133,8 @@ function addGoal(event) {
   
   const goalScorerName = elements.goalScorer.value;
   const goalAssistName = elements.goalAssist.value;
-  
- //  if (!goalScorerName) {
- //   alert('Please select a goal scorer');
- //  return;
- // }
- // 
- //if (!goalAssistName) {
- //   alert('Please select an assist');
- //   return;
- // }
-  
   const currentSeconds = getCurrentSeconds();
+  
   const goalData = {
     timestamp: Math.ceil(currentSeconds / 60),
     goalScorerName,
@@ -156,10 +146,8 @@ function addGoal(event) {
   updateLog();
   Storage.save(STORAGE_KEYS.GOALS, STATE.data);
   
-  // Reset form and update Materialize select
+  // Reset form
   elements.goalForm.reset();
- // M.FormSelect.init(elements.goalScorer);
- //M.FormSelect.init(elements.goalAssist);
 }
 // Add Opposition Goal
 function opaddGoal() {
@@ -175,10 +163,8 @@ function opaddGoal() {
   updateLog();
   Storage.save(STORAGE_KEYS.GOALS, STATE.data);
   
-    // Reset form and update Materialize select
+    // Reset form
   elements.goalForm.reset();
-  //M.FormSelect.init(elements.goalScorer);
-  //M.FormSelect.init(elements.goalAssist);
 }
 // Update Goal Log
 function updateLog() {
@@ -290,11 +276,7 @@ function shareToWhatsApp() {
 // Initialize application
 function initializeApp() {
 	
-	  // Initialize Materialize Modal and Form Select
-  //M.Modal.init(document.getElementById('rosterModal'));
-  //M.FormSelect.init(document.querySelectorAll('select'));
-  
-    // Initialize roster
+  // Initialize roster
   RosterManager.init();
 	
   // Load saved data
@@ -314,10 +296,6 @@ function initializeApp() {
   // Update UI with saved data
   updateStopwatchDisplay();
   updateLog();
-  //elements.startPauseButton.textContent = STATE.isRunning ? "Pause Game" : "Start Game";
-  
-  // Initialize Materialize components
-  //M.FormSelect.init(document.querySelectorAll('select'));
 }
 
 // Event Listeners

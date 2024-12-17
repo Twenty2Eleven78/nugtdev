@@ -44,7 +44,7 @@
       <div class="col-12 col-md-6">
         <div class="card h-100">
           <div class="card-body">
-            <h5 class="card-title">Goal Scored</h5>
+            <h5 class="card-title">Game Actions</h5>
             <form id="goalForm">
               <div class="mb-3">
                 <label for="goalScorer" class="form-label">Goal Scorer:</label>
@@ -81,25 +81,49 @@
             <h5 class="card-title">Score Board</h5><hr>
             <div class="row">
               <div class="col-6 text-center">
-                <h4 id="team1-score">0</h4>
-                <p>Team 1</p>
+                <h1 id="team1-score">0</h1>
+                <div id="team1-name">Team 1</div>
               </div>
               <div class="col-6 text-center">
-                <h4 id="team2-score">0</h4>
-                <p>Team 2</p>
+                <h1 id="team2-score" class="">0</h1>
+                <div id="team2-name">Team 1</div>
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
+    
+    <div>&nbsp;</div>
 
-    <div class="row mt-3">
-      <div class="col-12">
-        <h4>Goal Log</h4>
-        <div id="log" role="log" aria-live="polite" class="border rounded p-2"></div>
+    <div class="tab-content pt-5">
+      <div class="tab-pane container active" id="game">Content of Tab 1</div>
+      <div class="tab-pane container fade" id="config">
+        
+        <!--goal log-->
+        <div class="row mt-3">
+          <div class="col-12">
+            <h4>Goal Log</h4>
+            <div id="log" role="log" aria-live="polite" class="border rounded p-2"></div>
+          </div>
+        </div>
+
+        
       </div>
     </div>
+
+    <ul class="nav nav-fill nav-pills" role="tablist">
+      <li class="nav-item">
+        <a class="nav-link active" data-bs-toggle="pill" href="#game" aria-selected="true"><i class="fa-regular fa-futbol"></i> Game</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link"  data-bs-toggle="pill" href="#config"  aria-selected="false"><i class="fa-solid fa-gears"></i> <b>Config</b></a>
+      </li>
+    </ul>
+
+    
+
+    
 
     <div class="row mt-3">
       <div class="col-12 d-flex gap-2">
@@ -109,6 +133,9 @@
         </button>
       </div>
     </div>
+
+    
+    
 
     <!-- Players Modal -->
     <div class="modal fade" id="rosterModal" tabindex="-1">

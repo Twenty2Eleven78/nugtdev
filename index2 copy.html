@@ -23,6 +23,29 @@
         .timer-badge-active {
             background-color: rgba(255,255,255,0.3);
         }
+        .tab-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.tab {
+    display: none;
+}
+
+.tab-nav {
+    display: flex;
+    justify-content: space-around;
+}
+
+.tab-nav button {
+    /* Style the buttons as needed */
+}
+
+/* Show the initial tab */
+#roster {
+    display: block;
+}
     </style>
 </head>
 <body>
@@ -38,16 +61,25 @@
             </div>
         </div>
     </div>
-    <button id="open-modal" class="btn btn-primary">View Release Notes</button>
+    
 
-<div id="myModal" class="modal">
-  <div class="modal-content">
-    <span class="close">&times;</span>
-    <h2>Release Notes</h2>
-    <p>Check out the latest updates and bug fixes:</p>
-    <a href="https://your-release-notes-url" target="_blank">View Release Notes</a>
-  </div>
-</div>
+    <div class="tab-content">
+        <div id="roster" class="tab">
+            </div>
+        <div id="goal-log" class="tab">
+            </div>
+        <div id="reset" class="tab">
+            </div>
+        <div id="whatsapp" class="tab">
+            </div>
+    </div>
+
+    <div class="tab-nav">
+        <button id="roster-tab">Roster</button>
+        <button id="goal-log-tab">Goal Log</button>
+        <button id="reset-tab">Reset</button>
+        <button id="whatsapp-tab">WhatsApp</button>
+    </div>
 
     <script>
         // Inline Timer
@@ -108,31 +140,19 @@
             }
         })();
 
-        // Get the modal
-var modal = document.getElementById("myModal");
+        const tabs = document.querySelectorAll('.tab');
+const navButtons = document.querySelectorAll('.tab-nav button');
 
-// Get the button that opens the modal
-var btn = document.getElementById("open-modal");
+navButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        const tabId = button.id.replace('-tab', '');
+        tabs.forEach(tab => {
+            tab.style.display = 'none';
+        });
+        document.getElementById(tabId).style.display = 'block';
+    });
+});
 
-// Get the <span> element that closes the modal
-var span = document.getElementsByClassName("close")[0];
-
-// When the user clicks the button, open the modal 
-btn.onclick = function() {
-  modal.style.display = "block";
-}
-
-// When the user clicks on <span> (x), close the modal
-span.onclick = function() {
-  modal.style.display = "none";
-}
-
-// When the user clicks anywhere outside of the modal, close it
-window.onclick = function(event) {
-  if (event.target == modal) {
-    modal.style.display = "none";
-  }
-}
     </script>
 </body>
 </html>
