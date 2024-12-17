@@ -13,7 +13,7 @@
   <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
 </head>
 <body>
-  
+  <!--Main Container-->
   <div class="container-fluid px-4 py-3">
     <div class="row mb-3">
       <div class="col-12">
@@ -23,119 +23,149 @@
         </small>
       </div>
     </div>
+  
+    <!--Game Container Tab-->
+  <div class="tab-content container-fluid px-1 py-2">
+    <div class="tab-pane active" id="gametab">
+      <!--Game Timer Card-->
+      <div class="row">
+        <div class="col-12 col-md-6">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title">Game Timer</h5><hr>
+              <div class="text-center">
+                <button class="btn btn-danger timer-btn-inline" id="startPauseButton">Start Game
+                <span id="stopwatch" role="timer" class="timer-badge">00:00</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!--Seperator-->
+      <div>&nbsp;</div>
+      <!-- Game Actions Card-->
+      <div class="row">
+        <div class="col-12 col-md-6">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title">Game Actions</h5>
+              <form id="goalForm">
+                <div class="mb-3">
+                  <label for="goalScorer" class="form-label">Goal Scorer:</label>
+                  <select id="goalScorer" class="form-select" required oninvalid="this.setCustomValidity('Please select a Goal Scorer')" oninput="setCustomValidity('')">
+                    <option value="" disabled selected>Select goal scorer</option>
+                    <!-- Roster entries will be dynamically added here -->
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label for="goalAssist" class="form-label">Goal Assist:</label>
+                  <select id="goalAssist" class="form-select" required oninvalid="this.setCustomValidity('Please select an Assist')" oninput="setCustomValidity('')">
+                    <option value="" selected>Select goal assist</option>
+                    <option value="N/A">N/A</option>
+                    <!-- Roster entries will be dynamically added here -->
+                  </select>
+                </div>
+                <div class="d-flex gap-2">
+                  <button type="submit" class="btn btn-success btn-custom" id="goalButton">Add Goal</button>
+                  <button class="btn btn-danger btn-custom" type="button" id="opgoalButton">Opposition Goal</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div> 
+      <!--Seperator--> 
+      <div>&nbsp;</div>
+      <!--Score Board Card-->
+      <div class="row">
+        <div class="col-12 col-md-6">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title">Score Board</h5><hr>
+              <div class="row">
+                <div class="col-6 text-center">
+                  <h1 id="team1-score">0</h1>
+                  <div id="team1-name">Team 1</div>
+                </div>
+                <div class="col-6 text-center">
+                  <h1 id="team2-score" class="">0</h1>
+                  <div id="team2-name">Team 1</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!--Seperator-->
+      <div>&nbsp;</div>
+    </div>
+  </div>
 
-    <div class="row">
-      <div class="col-12 col-md-6">
-        <div class="card h-100">
-          <div class="card-body">
-            <h5 class="card-title">Game Timer</h5><hr>
-            <div class="text-center">
-              <button class="btn btn-danger timer-btn-inline" id="startPauseButton">
-                Start Game
-              <span id="stopwatch" role="timer" class="timer-badge">00:00</span>
+  <!--Game Log Container Tab-->
+  <div class="tab-content container-fluid px-1 py-2">
+    <div class="tab-pane" id="gamelogtab">
+      <!--game log-->
+      <div class="row">
+        <div class="col-12 col-md-6">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title"><i class="fa-solid fa-list"></i> Game log</h5><hr>
+              <div id="log" role="log" aria-live="polite" class="border rounded p-2"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!--Seperator-->
+      <div>&nbsp;</div>
+    </div>
+  </div>
+    
+  <!--Config Container Tab-->
+  <div class="tab-content container-fluid px-1 py-2">
+    <div class="tab-pane" id="configtab">
+      <!--game log-->
+      <div class="row">
+        <div class="col-12 col-md-6">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title"><i class="fa-solid fa-gears"></i> Config</h5><hr>
+              <button class="btn btn-danger btn-custom" id="resetButton">Reset</button>
+              <button class="btn btn-success btn-custom" id="shareButton">
+                <i class="fas fa-share-alt me-2"></i>Send WhatsApp Report
               </button>
             </div>
           </div>
         </div>
       </div>
-
-    <div>&nbsp;</div>
-
-      <div class="col-12 col-md-6">
-        <div class="card h-100">
-          <div class="card-body">
-            <h5 class="card-title">Game Actions</h5>
-            <form id="goalForm">
-              <div class="mb-3">
-                <label for="goalScorer" class="form-label">Goal Scorer:</label>
-                <select id="goalScorer" class="form-select" required oninvalid="this.setCustomValidity('Please select a Goal Scorer')" oninput="setCustomValidity('')">
-                  <option value="" disabled selected>Select goal scorer</option>
-                  <!-- Roster entries will be dynamically added here -->
-                </select>
-              </div>
-              <div class="mb-3">
-                <label for="goalAssist" class="form-label">Goal Assist:</label>
-                <select id="goalAssist" class="form-select" required oninvalid="this.setCustomValidity('Please select an Assist')" oninput="setCustomValidity('')">
-                  <option value="" selected>Select goal assist</option>
-                  <option value="N/A">N/A</option>
-                  <!-- Roster entries will be dynamically added here -->
-                </select>
-              </div>
-
-              <div class="d-flex gap-2">
-                <button type="submit" class="btn btn-success btn-custom" id="goalButton">Add Goal</button>
-                <button class="btn btn-danger btn-custom" type="button" id="opgoalButton">Opposition Goal</button>
-              </div>
-            </form>
+      <!--Seperator-->
+      <div>&nbsp;</div>
+    </div>
+  </div>
+  
+  <!--Navigation Pills-->
+  <div class="row bottom-element">
+    <div class="col-12 col-md-6">
+      <div class="card h-75" style="padding-left: 10px;">
+        <div class="card-body">
+          <div class="row">
+            <ul class="nav nav-fill nav-pills" role="tablist">
+              <li class="nav-item pill-1">
+                <a class="nav-link active" data-bs-toggle="pill" href="#gametab" aria-selected="true"><i class="fa-regular fa-futbol"></i> <b>Game</b></a>
+              </li>
+              <li class="nav-item pill-2">
+                <a class="nav-link" data-bs-toggle="pill" href="#gamelogtab" aria-selected="false"><i class="fa-solid fa-list"></i> <b>Log</b></a>
+              </li>
+              <li class="nav-item pill-3">
+                <a class="nav-link"  data-bs-toggle="pill" href="#configtab"  aria-selected="false"><i class="fa-solid fa-gears"></i> <b>Config</b></a>
+              </li>
+            </ul>
           </div>
         </div>
       </div>
     </div>
-
-    <div>&nbsp;</div>
-
-    <div class="row">
-      <div class="col-12 col-md-6">
-        <div class="card h-100">
-          <div class="card-body">
-            <h5 class="card-title">Score Board</h5><hr>
-            <div class="row">
-              <div class="col-6 text-center">
-                <h1 id="team1-score">0</h1>
-                <div id="team1-name">Team 1</div>
-              </div>
-              <div class="col-6 text-center">
-                <h1 id="team2-score" class="">0</h1>
-                <div id="team2-name">Team 1</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    <div>&nbsp;</div>
-
-    <div class="tab-content pt-5">
-      <div class="tab-pane container active" id="game">Content of Tab 1</div>
-      <div class="tab-pane container fade" id="config">
-        
-        <!--goal log-->
-        <div class="row mt-3">
-          <div class="col-12">
-            <h4>Goal Log</h4>
-            <div id="log" role="log" aria-live="polite" class="border rounded p-2"></div>
-          </div>
-        </div>
-
-        
-      </div>
-    </div>
-
-    <ul class="nav nav-fill nav-pills" role="tablist">
-      <li class="nav-item">
-        <a class="nav-link active" data-bs-toggle="pill" href="#game" aria-selected="true"><i class="fa-regular fa-futbol"></i> Game</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link"  data-bs-toggle="pill" href="#config"  aria-selected="false"><i class="fa-solid fa-gears"></i> <b>Config</b></a>
-      </li>
-    </ul>
-
-    
-
-    
-
-    <div class="row mt-3">
-      <div class="col-12 d-flex gap-2">
-        <button class="btn btn-danger btn-custom" id="resetButton">Reset</button>
-        <button class="btn btn-success btn-custom" id="shareButton">
-          <i class="fas fa-share-alt me-2"></i>Send WhatsApp Report
-        </button>
-      </div>
-    </div>
-
-    
-    
+  </div>
+</div> 
 
     <!-- Players Modal -->
     <div class="modal fade" id="rosterModal" tabindex="-1">
