@@ -280,29 +280,6 @@ function fetchReadme() {
       .then(text => {
           // Simple markdown to HTML conversion for basic elements
           const html = text
-              // Convert headers
-              //.replace(/^# (.*$)/gm, '<h1>$1</h1>')
-              //.replace(/^## (.*$)/gm, '<h2>$1</h2>')
-              //.replace(/^### (.*$)/gm, '<h3>$1</h3>')
-              // Convert bold text
-              //.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-              // Convert italics
-              //.replace(/\*(.*?)\*/g, '<em>$1</em>')
-              // Convert code blocks
-              //.replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
-              // Convert inline code
-              //.replace(/`(.*?)`/g, '<code>$1</code>')
-              // Convert links
-              //.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2">$1</a>')
-              // Convert lists
-              //.replace(/^\- (.*$)/gm, '<li>$1</li>')
-              // Convert paragraphs
-              //.replace(/^\s*(\n)?(.+)/gm, function(match) {
-              //    return /^<(\/)?(h\d|ul|ol|li|blockquote|pre|img)/.test(match) ? match : '<p>' + match + '</p>';
-              //})
-              // Clean up extra paragraphs
-              //.replace(/<\/p><p>/g, '</p>\n<p>');
-
           document.getElementById('readme').innerHTML = html;
       })
       .catch(error => {
