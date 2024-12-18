@@ -1,5 +1,5 @@
-<b>NUFC MatchTime App Release Notes</b>
-
+<font color="red"<b>NUFC MatchTime App Release Notes</b></font>
+<br><br>
 <li>1.0 - Initial working application modal</li>
 <li>1.1 - layout Changes</li>
 <li>1.2 - Whats App Report</li>
