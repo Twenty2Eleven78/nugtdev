@@ -313,3 +313,28 @@ document.addEventListener('visibilitychange', () => {
     updateStopwatchDisplay();
   }
 });
+
+// Handle tab-content visability
+document.addEventListener('DOMContentLoaded', function() {
+  // Select all navigation pills
+  const navLinks = document.querySelectorAll('.nav-link');
+  
+  navLinks.forEach(link => {
+    link.addEventListener('click', function(e) {
+      // Get the target tab content ID
+      const targetId = this.getAttribute('href');
+      const targetTabContent = document.querySelector(targetId + '-content');
+
+      // Hide all tab contents
+      const allTabContents = document.querySelectorAll('.tab-content');
+      allTabContents.forEach(content => {
+        content.style.display = 'none';
+      });
+
+      // Display the target tab content
+      if (targetTabContent) {
+        targetTabContent.style.display = 'block';
+      }
+    });
+  });
+});

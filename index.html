@@ -14,7 +14,7 @@
 </head>
 <body>
   <!--Main Container-->
-  <div class="container-fluid px-4 py-3">
+  <div class="container-fluid px-4 py-3 d-flex flex-column full-height">
     <div class="row mb-3">
       <div class="col-12">
         <h3 class="d-inline">Goal Tracker v3.0</h3>
@@ -25,7 +25,7 @@
     </div>
   
     <!--Game Container Tab-->
-  <div class="tab-content container-fluid px-1 py-2">
+  <div class="tab-content container-fluid px-1 py-2" id="gametab-content">
     <div class="tab-pane active" id="gametab">
       <!--Game Timer Card-->
       <div class="row">
@@ -97,13 +97,11 @@
           </div>
         </div>
       </div>
-      <!--Seperator-->
-      <div>&nbsp;</div>
     </div>
   </div>
 
   <!--Game Log Container Tab-->
-  <div class="tab-content container-fluid px-1 py-2">
+  <div class="tab-content container-fluid px-1 py-2" id="gamelogtab-content">
     <div class="tab-pane" id="gamelogtab">
       <!--game log-->
       <div class="row">
@@ -116,13 +114,11 @@
           </div>
         </div>
       </div>
-      <!--Seperator-->
-      <div>&nbsp;</div>
     </div>
   </div>
     
   <!--Config Container Tab-->
-  <div class="tab-content container-fluid px-1 py-2">
+  <div class="tab-content container-fluid px-1 py-2" id="configtab-content">
     <div class="tab-pane" id="configtab">
       <!--game log-->
       <div class="row">
@@ -141,17 +137,15 @@
           </div>
         </div>
       </div>
-      <!--Seperator-->
-      <div>&nbsp;</div>
     </div>
   </div>
   
   <!--Navigation Pills-->
-  <div class="row bottom-element">
+  <div class="row mt-auto">
     <div class="col-12 col-md-6">
       <div class="card h-75" style="padding-left: 10px;">
         <div class="card-body">
-          <div class="row">
+          
             <ul class="nav nav-fill nav-pills" role="tablist">
               <li class="nav-item pill-1">
                 <a class="nav-link active" data-bs-toggle="pill" href="#gametab" aria-selected="true"><i class="fa-regular fa-futbol"></i> <b>Game</b></a>
@@ -163,7 +157,7 @@
                 <a class="nav-link"  data-bs-toggle="pill" href="#configtab"  aria-selected="false"><i class="fa-solid fa-gears"></i> <b>Config</b></a>
               </li>
             </ul>
-          </div>
+          
         </div>
       </div>
     </div>
