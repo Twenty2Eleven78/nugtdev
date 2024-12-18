@@ -273,6 +273,44 @@ function shareToWhatsApp() {
   window.open(whatsappURL, '_blank');
 }
 
+// include README.MD as release notes
+function fetchReadme() {
+  fetch('README.md')
+      .then(response => response.text())
+      .then(text => {
+          // Simple markdown to HTML conversion for basic elements
+          const html = text
+              // Convert headers
+              .replace(/^# (.*$)/gm, '<h1>$1</h1>')
+              .replace(/^## (.*$)/gm, '<h2>$1</h2>')
+              .replace(/^### (.*$)/gm, '<h3>$1</h3>')
+              // Convert bold text
+              .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+              // Convert italics
+              .replace(/\*(.*?)\*/g, '<em>$1</em>')
+              // Convert code blocks
+              .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
+              // Convert inline code
+              .replace(/`(.*?)`/g, '<code>$1</code>')
+              // Convert links
+              .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2">$1</a>')
+              // Convert lists
+              .replace(/^\- (.*$)/gm, '<li>$1</li>')
+              // Convert paragraphs
+              .replace(/^\s*(\n)?(.+)/gm, function(match) {
+                  return /^<(\/)?(h\d|ul|ol|li|blockquote|pre|img)/.test(match) ? match : '<p>' + match + '</p>';
+              })
+              // Clean up extra paragraphs
+              .replace(/<\/p><p>/g, '</p>\n<p>');
+
+          document.getElementById('readme').innerHTML = html;
+      })
+      .catch(error => {
+          console.error('Error loading README:', error);
+          document.getElementById('readme').innerHTML = 'Error loading README file.';
+      });
+}
+
 // Initialize application
 function initializeApp() {
 	
@@ -305,6 +343,7 @@ elements.opgoalButton.addEventListener('click', opaddGoal);
 elements.resetButton.addEventListener('click', resetTracker);
 elements.shareButton.addEventListener('click', shareToWhatsApp);
 document.addEventListener('DOMContentLoaded', initializeApp);
+document.addEventListener('DOMContentLoaded', fetchReadme);
 
 
 // Handle page visibility changes
@@ -314,27 +353,27 @@ document.addEventListener('visibilitychange', () => {
   }
 });
 
-// Handle tab-content visability
-document.addEventListener('DOMContentLoaded', function() {
-  // Select all navigation pills
-  const navLinks = document.querySelectorAll('.nav-link');
-  
-  navLinks.forEach(link => {
-    link.addEventListener('click', function(e) {
-      // Get the target tab content ID
-      const targetId = this.getAttribute('href');
-      const targetTabContent = document.querySelector(targetId + '-content');
-
-      // Hide all tab contents
-      const allTabContents = document.querySelectorAll('.tab-content');
-      allTabContents.forEach(content => {
-        content.style.display = 'none';
-      });
-
-      // Display the target tab content
-      if (targetTabContent) {
-        targetTabContent.style.display = 'block';
-      }
-    });
-  });
-});
+// // Handle tab-content visability
+// document.addEventListener('DOMContentLoaded', function() {
+// // Select all navigation pills
+// const navLinks = document.querySelectorAll('.nav-link');
+//  
+//  navLinks.forEach(link => {
+//    link.addEventListener('click', function(e) {
+//      // Get the target tab content ID
+//      const targetId = this.getAttribute('href');
+//      const targetTabContent = document.querySelector(targetId + '-content');
+//
+//      // Hide all tab contents
+//      const allTabContents = document.querySelectorAll('.tab-content');
+//      allTabContents.forEach(content => {
+//        content.style.display = 'none';
+//      });
+//
+//      // Display the target tab content
+//      if (targetTabContent) {
+//        targetTabContent.style.display = 'block';
+//      }
+//    });
+//  });
+//});

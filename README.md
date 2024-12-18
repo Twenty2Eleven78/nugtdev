@@ -1,11 +1,10 @@
-NUFC Goal Tracker Release Notes
+<b>NUFC MatchTime App Release Notes</b>
 
-1.0     - Initial working applicatio model
-1.1     - layout Changes
-1.2     - Whats App Report
-1.3     - General application ui and function improvements
-2.0     - Added Roster Management feature
-2.1     - General application ui and function improvements
-2.11    - Added time rounding (round up) to Goal Log
-2.12    - localise google font style and fix manifest start_url
-3.0     - UI overhall for a more modern feel
+<li>1.0     - Initial working application model</li>
+<li>1.1     - layout Changes</li>
+<li>1.2     - Whats App Report</li>
+<li>1.3     - General application ui and function improvements</li>
+<li>2.0     - Added Roster/team Management feature</li>
+<li>2.1     - General application ui and function improvements</li>
+<li>2.11    - Added time rounding (round up) to Goal Log</li>
+<li><b>3.0  - UI Overhall, ScoreBoard, Nav Pills, Modals</b></li>

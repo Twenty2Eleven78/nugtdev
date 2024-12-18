@@ -8,89 +8,111 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- Optional: Font Awesome for icons -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-  <link href="style.css" rel="stylesheet">
+  <!--custom style-->
+  <link href="/css/style.css" rel="stylesheet">
+  <!-- PWA Manifest-->
   <link rel="manifest" href="manifest.json">
   <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
 </head>
 <body>
-  <!--Main Container-->
-  <div class="container-fluid px-4 py-3 d-flex flex-column full-height">
-    <div class="row mb-3">
-      <div class="col-12">
-        <h3 class="d-inline">Goal Tracker v3.0</h3>
-        <small class="d-inline">
-          <a href="https://twenty2011878.github.io/nugtdev/README.md" class="text-decoration-none">(Release Notes)</a>
-        </small>
-      </div>
-    </div>
-  
-    <!--Game Container Tab-->
-  <div class="tab-content container-fluid px-1 py-2" id="gametab-content">
-    <div class="tab-pane active" id="gametab">
-      <!--Game Timer Card-->
-      <div class="row mt-auto">
-        <div class="col-12 col-md-6">
-          <div class="card h-100">
-            <div class="card-body">
-              <h5 class="card-title">Game Timer</h5><hr>
-              <div class="text-center">
-                <button class="btn btn-danger timer-btn-inline" id="startPauseButton">Start Game
-                <span id="stopwatch" role="timer" class="timer-badge">00:00</span>
-                </button>
+  <!-- Main Container -->
+  <div class="main-container">
+    <div class="container-fluid px-4 py-3">
+      <div class="content-width">
+        <!-- Header -->
+        <div class="row mb-3">
+          <div class="col-12">
+            <h3 class="d-inline">Goal Tracker v3.0</h3>
+            <small class="d-inline">
+              <button class="btn btn-link" data-bs-toggle="modal" data-bs-target="#releasenotesmodal"><small>Release Notes</small></button>
+            </small>
+          </div>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="content-wrapper">
+          <div class="tab-content" id="gametab-content">
+            <!-- Game Tab -->
+            <div class="tab-pane fade show active" id="gametab">
+              <!-- Game Timer Card -->
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title">Game Timer</h5><hr>
+                  <div class="text-center">
+                    <button class="btn btn-danger timer-btn-inline" id="startPauseButton">
+                      Start Game
+                      <span id="stopwatch" role="timer" class="timer-badge">00:00</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Game Actions Card -->
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title">Game Actions</h5>
+                  <form id="goalForm">
+                    <div class="mb-3">
+                      <label for="goalScorer" class="form-label">Goal Scorer:</label>
+                      <select id="goalScorer" class="form-select" required>
+                        <option value="" disabled selected>Select goal scorer</option>
+                      </select>
+                    </div>
+                    <div class="mb-3">
+                      <label for="goalAssist" class="form-label">Goal Assist:</label>
+                      <select id="goalAssist" class="form-select" required>
+                        <option value="" selected>Select goal assist</option>
+                        <option value="N/A">N/A</option>
+                      </select>
+                    </div>
+                    <div class="d-flex gap-2">
+                      <button type="submit" class="btn btn-success btn-custom" id="goalButton">Add Goal</button>
+                      <button class="btn btn-danger btn-custom" type="button" id="opgoalButton">Opposition Goal</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+
+              <!-- Score Board Card -->
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title">Score Board</h5><hr>
+                  <div class="row">
+                    <div class="col-6 text-center">
+                      <h1 id="team1-score">0</h1>
+                      <div id="team1-name">Team 1</div>
+                    </div>
+                    <div class="col-6 text-center">
+                      <h1 id="team2-score">0</h1>
+                      <div id="team2-name">Team 2</div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-      <!--Seperator-->
-      <div><p></p></div>
-      <!-- Game Actions Card-->
-      <div class="row mt-auto">
-        <div class="col-12 col-md-6">
-          <div class="card h-100">
-            <div class="card-body">
-              <h5 class="card-title">Game Actions</h5>
-              <form id="goalForm">
-                <div class="mb-3">
-                  <label for="goalScorer" class="form-label">Goal Scorer:</label>
-                  <select id="goalScorer" class="form-select" required oninvalid="this.setCustomValidity('Please select a Goal Scorer')" oninput="setCustomValidity('')">
-                    <option value="" disabled selected>Select goal scorer</option>
-                    <!-- Roster entries will be dynamically added here -->
-                  </select>
+
+            <!-- Game Log Tab -->
+            <div class="tab-pane fade" id="gamelogtab">
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title"><i class="fa-solid fa-list"></i> Game log</h5><hr>
+                  <div id="log" role="log" aria-live="polite" class="border rounded p-2"></div>
                 </div>
-                <div class="mb-3">
-                  <label for="goalAssist" class="form-label">Goal Assist:</label>
-                  <select id="goalAssist" class="form-select" required oninvalid="this.setCustomValidity('Please select an Assist')" oninput="setCustomValidity('')">
-                    <option value="" selected>Select goal assist</option>
-                    <option value="N/A">N/A</option>
-                    <!-- Roster entries will be dynamically added here -->
-                  </select>
-                </div>
-                <div class="d-flex gap-2">
-                  <button type="submit" class="btn btn-success btn-custom" id="goalButton">Add Goal</button>
-                  <button class="btn btn-danger btn-custom" type="button" id="opgoalButton">Opposition Goal</button>
-                </div>
-              </form>
+              </div>
             </div>
-          </div>
-        </div>
-      </div> 
-      <!--Seperator--> 
-      <div><p></p></div>
-      <!--Score Board Card-->
-      <div class="row mt-auto">
-        <div class="col-12 col-md-6">
-          <div class="card h-100">
-            <div class="card-body">
-              <h5 class="card-title">Score Board</h5><hr>
-              <div class="row">
-                <div class="col-6 text-center">
-                  <h1 id="team1-score">0</h1>
-                  <div id="team1-name">Team 1</div>
-                </div>
-                <div class="col-6 text-center">
-                  <h1 id="team2-score" class="">0</h1>
-                  <div id="team2-name">Team 2</div>
+
+            <!-- Config Tab -->
+            <div class="tab-pane fade" id="configtab">
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title"><i class="fa-solid fa-gears"></i> Config</h5><hr>
+                  <button class="btn btn-danger btn-custom" id="resetButton">Reset</button>
+                  <button class="btn btn-success btn-custom" id="shareButton">
+                    <i class="fas fa-share-alt me-2"></i>Send WhatsApp Report
+                  </button>
+                  <button class="btn btn-danger btn-custom" data-bs-toggle="modal" data-bs-target="#rosterModal">
+                    <i class="fas fa-users"></i>Roster
+                  </button>
                 </div>
               </div>
             </div>
@@ -100,116 +122,90 @@
     </div>
   </div>
 
-  <!--Game Log Container Tab-->
-  <div class="tab-content container-fluid px-1 py-2" id="gamelogtab-content">
-    <div class="tab-pane" id="gamelogtab">
-      <!--game log-->
-      <div class="row">
-        <div class="col-12 col-md-6">
-          <div class="card h-100">
-            <div class="card-body">
-              <h5 class="card-title"><i class="fa-solid fa-list"></i> Game log</h5><hr>
-              <div id="log" role="log" aria-live="polite" class="border rounded p-2"></div>
-            </div>
-          </div>
-        </div>
-      </div>
+  <!-- Fixed Bottom Navigation -->
+  <div class="bottom-nav">
+    <div class="content-width">
+      <ul class="nav nav-pills nav-fill" role="tablist">
+        <li class="nav-item pill-1">
+          <a class="nav-link active" data-bs-toggle="pill" href="#gametab">
+            <i class="fa-regular fa-futbol"></i> <b>Game</b>
+          </a>
+        </li>
+        <li class="nav-item pill-2">
+          <a class="nav-link" data-bs-toggle="pill" href="#gamelogtab">
+            <i class="fa-solid fa-list"></i> <b>Log</b>
+          </a>
+        </li>
+        <li class="nav-item pill-3">
+          <a class="nav-link" data-bs-toggle="pill" href="#configtab">
+            <i class="fa-solid fa-gears"></i> <b>Config</b>
+          </a>
+        </li>
+      </ul>
     </div>
   </div>
-    
-  <!--Config Container Tab-->
-  <div class="tab-content container-fluid px-1 py-2" id="configtab-content">
-    <div class="tab-pane" id="configtab">
-      <!--game log-->
-      <div class="row">
-        <div class="col-12 col-md-6">
-          <div class="card h-100">
-            <div class="card-body">
-              <h5 class="card-title"><i class="fa-solid fa-gears"></i> Config</h5><hr>
-              <button class="btn btn-danger btn-custom" id="resetButton">Reset</button>
-              <button class="btn btn-success btn-custom" id="shareButton">
-                <i class="fas fa-share-alt me-2"></i>Send WhatsApp Report
-              </button>
-              <button class="btn btn-danger btn-custom" data-bs-toggle="modal" data-bs-target="#rosterModal">
-                <i class="fas fa-users"></i>Roster
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  <!--Navigation Pills-->
-  <div class="row mt-auto">
-    <div class="col-12 col-md-6">
-      <div class="card h-75" style="padding-left: 10px;">
-        <div class="card-body">
-          
-            <ul class="nav nav-fill nav-pills" role="tablist">
-              <li class="nav-item pill-1">
-                <a class="nav-link active" data-bs-toggle="pill" href="#gametab" aria-selected="true"><i class="fa-regular fa-futbol"></i> <b>Game</b></a>
-              </li>
-              <li class="nav-item pill-2">
-                <a class="nav-link" data-bs-toggle="pill" href="#gamelogtab" aria-selected="false"><i class="fa-solid fa-list"></i> <b>Log</b></a>
-              </li>
-              <li class="nav-item pill-3">
-                <a class="nav-link"  data-bs-toggle="pill" href="#configtab"  aria-selected="false"><i class="fa-solid fa-gears"></i> <b>Config</b></a>
-              </li>
-            </ul>
-          
-        </div>
-      </div>
-    </div>
-  </div>
-</div> 
 
-    <!-- Players Modal -->
-    <div class="modal fade" id="rosterModal" tabindex="-1">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Team Management</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-          </div>
-          <div class="modal-body">
-            <div class="row">
-              <div class="col-12 col-md-8">
-                <div class="input-group mb-3">
-                  <input type="text" id="newPlayerName" class="form-control" placeholder="New Player Name">
-                  <button class="btn btn-danger" id="addPlayerBtn">Add Player</button>
-                </div>
-              </div>
-            </div>
-            
-            <div class="row">
-              <div class="col-12">
-                <table class="table table-striped">
-                  <thead>
-                    <tr>
-                      <th>Player Name</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody id="rosterList">
-                    <!-- Roster entries will be dynamically added here -->
-                  </tbody>
-                </table>
+<!-----------------------------------------Modal Section-------------------------------------->
+
+<!--Release Notes Modal-->
+<div class="modal fade" id="releasenotesmodal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Release Notes</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div id=readme class="modal-body readme-content">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Roster Modal (unchanged) -->
+  <div class="modal fade" id="rosterModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Team Management</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-12 col-md-8">
+              <div class="input-group mb-3">
+                <input type="text" id="newPlayerName" class="form-control" placeholder="New Player Name">
+                <button class="btn btn-danger" id="addPlayerBtn">Add Player</button>
               </div>
             </div>
           </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <div class="row">
+            <div class="col-12">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>Player Name</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="rosterList"></tbody>
+              </table>
+            </div>
           </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
         </div>
       </div>
     </div>
-
- 
+  </div>
 
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="script.js"></script>
-  <script src="roster.js"></script>
+  <script src="/js/script.js"></script>
+  <script src="/js/roster.js"></script>
 </body>
 </html>
