@@ -172,13 +172,15 @@ function updateLog() {
     .sort((a, b) => a.rawTime - b.rawTime)
     .map(({ timestamp, goalScorerName, goalAssistName }) => {
       const isOppositionGoal = goalScorerName === "Opposition Team";
-      const cardClass = isOppositionGoal ? 'red lighten-4' : ''; // Add red background for opposition goals
+      const cardClass = isOppositionGoal ? 'border-danger border-2' : 'border-success border-2'; // adds colour border to log
       
-      return `<div class="card-panel ${cardClass}">
-        <span class="blue-text text-darken-2">${timestamp}</span>' -  
-        <strong>${isOppositionGoal ? 'Opposition Goal' : 'Goal'}</strong>
+      return `<div class="card mb-2 ${cardClass}">
+        <div class="card-body p-2">
+        <span>${timestamp}</span>' -  
+        <strong>${isOppositionGoal ? '<font color="red">Opposition Goal</font>' : 'Goal'}</strong>
         ${isOppositionGoal ? '' : `: ${goalScorerName}, <strong>Assist:</strong> ${goalAssistName}`}
-       </div>`;
+       </div>
+        </div>`;
     })
     .join('');
 }
