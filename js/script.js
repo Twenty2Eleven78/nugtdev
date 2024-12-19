@@ -4,7 +4,9 @@ const STATE = {
   isRunning: false,
   intervalId: null,
   data: [],
-  startTimestamp: null
+  startTimestamp: null,
+  scoreOnBoard1: null,
+  scoreOnBoard2: null
 };
  
 // DOM Elements
@@ -146,6 +148,8 @@ function addGoal(event) {
   updateLog();
   Storage.save(STORAGE_KEYS.GOALS, STATE.data);
   
+  // Add to score Board
+  STATE.scoreOnBoard1++
   // Reset form
   elements.goalForm.reset();
 }
@@ -183,6 +187,13 @@ function updateLog() {
         </div>`;
     })
     .join('');
+}
+
+//Update Score Board
+function updateScorBoard() {
+  let oppositionGoals = 0;  // Initialize opposition goals counter
+  let teamGoals = 0;       // Initialize team goals counter
+  STATE.data.
 }
 
 // Reset the tracker
