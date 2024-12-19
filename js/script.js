@@ -15,7 +15,7 @@ const elements = {
   opgoalButton: document.getElementById('opgoalButton'),
   goalScorer: document.getElementById('goalScorer'),
   goalAssist: document.getElementById('goalAssist'),
-  resetButton: document.getElementById('resetButton'),
+  resetButton: document.getElementById('confirmResetBtn'),
   shareButton: document.getElementById('shareButton'),
   log: document.getElementById('log'),
   goalForm: document.getElementById('goalForm')
@@ -184,11 +184,9 @@ function updateLog() {
     })
     .join('');
 }
+
 // Reset the tracker
 function resetTracker() {
-  if (!confirm('Are you sure you want to reset the stopwatch and log data?')) {
-    return;
-  }
   // Reset state
   clearInterval(STATE.intervalId);
   STATE.seconds = 0;
@@ -209,6 +207,8 @@ function resetTracker() {
   startPauseButton.appendChild(timeSpan);
   // Clear storage
   Storage.clear();
+  //redirect to main tab
+  window.location.href = "index.html";
 }
 
 // Whatsapp Log Formatter
@@ -295,6 +295,7 @@ function initializeApp() {
 	
   // Initialize roster
   RosterManager.init();
+  let resetModal;
 	
   // Load saved data
   STATE.isRunning = Storage.load(STORAGE_KEYS.IS_RUNNING, false);
@@ -331,28 +332,3 @@ document.addEventListener('visibilitychange', () => {
     updateStopwatchDisplay();
   }
 });
-
-// // Handle tab-content visability
-// document.addEventListener('DOMContentLoaded', function() {
-// // Select all navigation pills
-// const navLinks = document.querySelectorAll('.nav-link');
-//  
-//  navLinks.forEach(link => {
-//    link.addEventListener('click', function(e) {
-//      // Get the target tab content ID
-//      const targetId = this.getAttribute('href');
-//      const targetTabContent = document.querySelector(targetId + '-content');
-//
-//      // Hide all tab contents
-//      const allTabContents = document.querySelectorAll('.tab-content');
-//      allTabContents.forEach(content => {
-//        content.style.display = 'none';
-//      });
-//
-//      // Display the target tab content
-//      if (targetTabContent) {
-//        targetTabContent.style.display = 'block';
-//      }
-//    });
-//  });
-//});

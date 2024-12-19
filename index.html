@@ -107,6 +107,9 @@
                 <div class="card-body">
                   <h5 class="card-title"><i class="fa-solid fa-gears"></i> Config</h5><hr>
                   <button class="btn btn-danger btn-custom" id="resetButton">Reset</button>
+                  <button class="btn btn-danger btn-custom" data-bs-toggle="modal" data-bs-target="#resetConfirmModal">
+                    <i class="fa-solid fa-arrows-rotate"></i> Reset
+                  </button>
                   <button class="btn btn-success btn-custom" id="shareButton">
                     <i class="fas fa-share-alt me-2"></i>Send WhatsApp Report
                   </button>
@@ -159,11 +162,45 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      
       </div>
     </div>
   </div>
 </div>
+
+<!--Confirm Reset Modal-->
+<div class="modal fade" id="resetConfirmModal" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title">
+          <i class="fas fa-exclamation-triangle me-2"></i>Confirm Reset
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="mb-0">Are you sure you want to reset the game?</p>
+        <small class="text-muted">This will clear all game data including:</small>
+        <ul class="text-muted small">
+          <li>Stopwatch time</li>
+          <li>Goals and assists</li>
+          <li>Game log</li>
+        </ul>
+        <div class="alert alert-warning mb-0">
+          <i class="fas fa-info-circle me-2"></i>This action cannot be undone.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          <i class="fas fa-times me-2"></i>Cancel
+        </button>
+        <button type="button" class="btn btn-danger" id="confirmResetBtn">
+          <i class="fas fa-trash me-2"></i>Reset Game
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 <!-- Roster Modal (unchanged) -->
   <div class="modal fade" id="rosterModal" tabindex="-1">
