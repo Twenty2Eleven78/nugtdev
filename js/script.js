@@ -5,8 +5,7 @@ const STATE = {
   intervalId: null,
   data: [],
   startTimestamp: null,
-  scoreOnBoard1: null,
-  scoreOnBoard2: null
+ 
 };
  
 // DOM Elements
@@ -20,7 +19,9 @@ const elements = {
   resetButton: document.getElementById('confirmResetBtn'),
   shareButton: document.getElementById('shareButton'),
   log: document.getElementById('log'),
-  goalForm: document.getElementById('goalForm')
+  goalForm: document.getElementById('goalForm'),
+  firstScoreElement: document.getElementById('first-score'),
+  secondScoreElement: document.getElementById('second-score')
 };
 
 // Constants
@@ -128,7 +129,6 @@ function startStopwatch() {
   Storage.save(STORAGE_KEYS.ELAPSED_TIME, STATE.seconds);
 }
 
-// Goal tracking
 // Add Team Goal
 function addGoal(event) {
   event.preventDefault();
@@ -144,12 +144,16 @@ function addGoal(event) {
     rawTime: currentSeconds
   };
   
+  //update log
   STATE.data.push(goalData);
   updateLog();
-  Storage.save(STORAGE_KEYS.GOALS, STATE.data);
   
-  // Add to score Board
-  STATE.scoreOnBoard1++
+  // update scoreboard
+   updateScoreBoard('first');
+  
+  //Save to storage
+  Storage.save(STORAGE_KEYS.GOALS, STATE.data);
+    
   // Reset form
   elements.goalForm.reset();
 }
@@ -163,8 +167,14 @@ function opaddGoal() {
     rawTime: currentSeconds
   };
   
+  //update log
   STATE.data.push(opgoalData);
   updateLog();
+
+// update scoreboard
+updateScoreBoard('second');
+
+  //save to storage
   Storage.save(STORAGE_KEYS.GOALS, STATE.data);
   
     // Reset form
@@ -190,11 +200,14 @@ function updateLog() {
 }
 
 //Update Score Board
-function updateScorBoard() {
-  let oppositionGoals = 0;  // Initialize opposition goals counter
-  let teamGoals = 0;       // Initialize team goals counter
-  STATE.data.
-}
+function updateScoreBoard(scorecard) {
+  if (scorecard === 'first') {
+    elements.firstScoreElement.textContent = parseInt(elements.firstScoreElement.textContent) + 1;
+  }
+  if (scorecard === 'second') {
+    elements.secondScoreElement.textContent = parseInt(elements.secondScoreElement.textContent) + 1;
+  }
+ }
 
 // Reset the tracker
 function resetTracker() {
@@ -325,6 +338,7 @@ function initializeApp() {
   // Update UI with saved data
   updateStopwatchDisplay();
   updateLog();
+
 }
 
 // Event Listeners
