@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Goal Tracker v3.0</title>
+  <title>NUFC MatchTime App v3.0</title>
   <!-- Bootstrap CSS -->
   <link href="css/bootstrap.min.css" rel="stylesheet">
   <!-- Optional: Font Awesome for icons -->
@@ -22,10 +22,7 @@
         <!-- Header -->
         <div class="row mb-3">
           <div class="col-12">
-            <h3 class="d-inline">Goal Tracker v3.0</h3>
-            <small class="d-inline">
-              <button class="btn btn-link" data-bs-toggle="modal" data-bs-target="#releasenotesmodal"><small>Release Notes</small></button>
-            </small>
+            <h3>NUFC MatchTime v3.0</h3>
           </div>
         </div>
 
@@ -37,7 +34,7 @@
               <!-- Game Timer Card -->
               <div class="card">
                 <div class="card-body">
-                  <h5 class="card-title">Game Timer</h5><hr>
+                  <h5 class="card-title"><i class="fa-regular fa-clock"></i> Game Timer</h5><hr>
                   <div class="text-center">
                     <button class="btn btn-danger timer-btn-inline" id="startPauseButton">
                       Start Game
@@ -50,7 +47,7 @@
               <!-- Game Actions Card -->
               <div class="card">
                 <div class="card-body">
-                  <h5 class="card-title">Game Actions</h5>
+                  <h5 class="card-title"><i class="fa-regular fa-futbol"></i> Game Actions</h5>
                   <form id="goalForm">
                     <div class="mb-3">
                       <label for="goalScorer" class="form-label">Goal Scorer:</label>
@@ -66,7 +63,7 @@
                       </select>
                     </div>
                     <div class="d-flex gap-2">
-                      <button type="submit" class="btn btn-success btn-custom" id="goalButton">Add Goal</button>
+                      <button type="submit" class="btn btn-success btn-custom" id="goalButton">Our Goal</button>
                       <button class="btn btn-danger btn-custom" type="button" id="opgoalButton">Opposition Goal</button>
                     </div>
                   </form>
@@ -76,7 +73,7 @@
               <!-- Score Board Card -->
               <div class="card" id="scoreboard">
                 <div class="card-body">
-                  <h5 class="card-title">Score Board</h5><hr>
+                  <h5 class="card-title"><i class="fa-regular fa-star"></i> Score Board</h5><hr>
                   <div class="row">
                     <div class="col-6 text-center">
                       <h1 id="first-score">0</h1>
@@ -95,7 +92,7 @@
             <div class="tab-pane fade" id="gamelogtab">
               <div class="card">
                 <div class="card-body">
-                  <h5 class="card-title"><i class="fa-solid fa-list"></i> Game log</h5><hr>
+                  <h5 class="card-title"><i class="fa-solid fa-list"></i> Match Events</h5><hr>
                   <div id="log" role="log" aria-live="polite" class="border rounded p-2"></div>
                 </div>
               </div>
@@ -106,15 +103,12 @@
               <div class="card">
                 <div class="card-body">
                   <h5 class="card-title"><i class="fa-solid fa-gears"></i> Config</h5><hr>
-                  <button class="btn btn-danger btn-custom" data-bs-toggle="modal" data-bs-target="#resetConfirmModal">
-                    <i class="fa-solid fa-arrows-rotate"></i> Reset MatchTime App
-                  </button>
-                  <button class="btn btn-success btn-custom" id="shareButton">
-                    <i class="fas fa-share-alt me-2"></i>Send WhatsApp Report
-                  </button>
-                  <button class="btn btn-danger btn-custom" data-bs-toggle="modal" data-bs-target="#rosterModal">
-                    <i class="fas fa-users"></i>Roster
-                  </button>
+                  <p><button class="btn btn-danger btn-custom" data-bs-toggle="modal" data-bs-target="#rosterModal"><i class="fas fa-users"></i> My Team Management</button></p>
+                  <p><button class="btn btn-danger btn-custom" data-bs-toggle="modal" data-bs-target="#fixtureModal"><i class="fas fa-users"></i> Fixture Management</button></p>
+                  <p><button class="btn btn-success btn-custom" id="shareButton"><i class="fas fa-share-alt me-2"></i>Send WhatsApp Report</button></p> 
+                  <hr> 
+                  <p><button class="btn btn-danger btn-custom" data-bs-toggle="modal" data-bs-target="#releasenotesmodal"><i class="fa-solid fa-list"></i> Release Notes</button>
+                  <p><button class="btn btn-danger btn-custom" data-bs-toggle="modal" data-bs-target="#resetConfirmModal"><i class="fa-solid fa-arrows-rotate"></i> Reset MatchTime App</button></p> 
                 </div>
               </div>
             </div>
@@ -135,7 +129,7 @@
         </li>
         <li class="nav-item pill-2">
           <a class="nav-link" data-bs-toggle="pill" href="#gamelogtab">
-            <i class="fa-solid fa-list"></i> <b>Log</b>
+            <i class="fa-solid fa-list"></i> <b>Events</b>
           </a>
         </li>
         <li class="nav-item pill-3">
@@ -150,14 +144,47 @@
 <!-----------------------------------------Modal Section-------------------------------------->
 
 <!--Release Notes Modal-->
-<div class="modal fade" id="releasenotesmodal" tabindex="-1">
+<div class="modal fade" id="releasenotesmodal" tabindex="-1" data-bs-backdrop="static" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
-      <div class="modal-header">
+      <div class="modal-header bg-danger text-white">
         <h5 class="modal-title">Release Notes</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
-      <div id=readme class="modal-body readme-content">
+      <div id=readme class="modal-body readme-content"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fas me-2"></i>Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Fixture Modal -->
+<div class="modal fade" id="fixtureModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Fixture Management</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-12 col-md-8">
+            <div class="input-group mb-3">
+              <div>
+               <h5>Team 1:</h5>
+               <input type="text" id="team1Name" class="form-control" placeholder="Team 1">
+               </p></dp>
+               <button class="btn btn-danger btn-custom" id="updTeam1Btn">Update Team</button>
+               <hr>
+               <h5>Team 2:</h5>
+               <input type="text" id="team2Name" class="form-control" placeholder="Team 2">
+               </p></dp>
+               <button class="btn btn-danger btn-custom" id="updTeam2Btn">Update Team</button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -166,42 +193,7 @@
   </div>
 </div>
 
-<!--Confirm Reset Modal-->
-<div class="modal fade" id="resetConfirmModal" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header bg-danger text-white">
-        <h5 class="modal-title">
-          <i class="fas fa-exclamation-triangle me-2"></i>Confirm Reset
-        </h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <p class="mb-0">Are you sure you want to reset the game?</p>
-        <small class="text-muted">This will clear all game data including:</small>
-        <ul class="text-muted small">
-          <li>Stopwatch time</li>
-          <li>Goals and assists</li>
-          <li>Game log</li>
-        </ul>
-        <div class="alert alert-warning mb-0">
-          <i class="fas fa-info-circle me-2"></i>This action cannot be undone.
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-          <i class="fas fa-times me-2"></i>Cancel
-        </button>
-        <button type="button" class="btn btn-danger" id="confirmResetBtn">
-          <i class="fas fa-trash me-2"></i>Reset Game
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-<!-- Roster Modal (unchanged) -->
+<!-- Roster Modal -->
   <div class="modal fade" id="rosterModal" tabindex="-1">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -238,6 +230,41 @@
       </div>
     </div>
   </div>
+
+  <!--Confirm Reset Modal-->
+<div class="modal fade" id="resetConfirmModal" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title">
+          <i class="fas fa-exclamation-triangle me-2"></i>Confirm Reset
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="mb-0">Are you sure you want to reset the game?</p>
+        <small class="text-muted">This will clear all game data including:</small>
+        <ul class="text-muted small">
+          <li>Stopwatch time</li>
+          <li>Goals and assists</li>
+          <li>Game log</li>
+        </ul>
+        <div class="alert alert-warning mb-0">
+          <i class="fas fa-info-circle me-2"></i>This action cannot be undone.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          <i class="fas fa-times me-2"></i>Cancel
+        </button>
+        <button type="button" class="btn btn-danger" id="confirmResetBtn">
+          <i class="fas fa-trash me-2"></i>Reset Game
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 
   <!-- Scripts -->
   <script src="js/bootstrap.bundle.min.js"></script>

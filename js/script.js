@@ -21,7 +21,13 @@ const elements = {
   log: document.getElementById('log'),
   goalForm: document.getElementById('goalForm'),
   firstScoreElement: document.getElementById('first-score'),
-  secondScoreElement: document.getElementById('second-score')
+  secondScoreElement: document.getElementById('second-score'),
+  Team1NameElement: document.getElementById('first-team-name'),
+  Team2NameElement: document.getElementById('second-team-name'),
+  team1Input: document.getElementById('team1Name'),
+  team2Input: document.getElementById('team2Name'),
+  updTeam1Btn: document.getElementById('updTeam1Btn'),
+  updTeam2Btn: document.getElementById('updTeam2Btn')
 };
 
 // Constants
@@ -29,7 +35,11 @@ const STORAGE_KEYS = {
   START_TIMESTAMP: 'goalTracker_startTimestamp',
   IS_RUNNING: 'goalTracker_isRunning',
   GOALS: 'goalTracker_goals',
-  ELAPSED_TIME: 'goalTracker_elapsedTime'
+  ELAPSED_TIME: 'goalTracker_elapsedTime',
+  FIRST_SCORE: 'goalTracker_firstScore',    
+  SECOND_SCORE: 'goalTracker_secondScore',
+  TEAM1_NAME: 'goalTracker_team1name',    
+  TEAM2_NAME: 'goalTracker_team2name'    
 };
 
 // Local Storage utilities
@@ -160,10 +170,11 @@ function addGoal(event) {
 // Add Opposition Goal
 function opaddGoal() {
   const currentSeconds = getCurrentSeconds();
+  const team2Name = elements.Team2NameElement.textContent;
   const opgoalData = {
     timestamp: Math.ceil(currentSeconds / 60),
-    goalScorerName: "Opposition Team",
-    goalAssistName: "Opposition Team",
+    goalScorerName: team2Name,
+    goalAssistName: team2Name,
     rawTime: currentSeconds
   };
   
@@ -185,29 +196,51 @@ function updateLog() {
   elements.log.innerHTML = STATE.data
     .sort((a, b) => a.rawTime - b.rawTime)
     .map(({ timestamp, goalScorerName, goalAssistName }) => {
-      const isOppositionGoal = goalScorerName === "Opposition Team";
+      const team2Name = elements.Team2NameElement.textContent;
+      const isOppositionGoal = goalScorerName === team2Name;
       const cardClass = isOppositionGoal ? 'border-danger border-2' : 'border-success border-2'; // adds colour border to log
       
       return `<div class="card mb-2 ${cardClass}">
         <div class="card-body p-2">
         <span>${timestamp}</span>' -  
-        <strong>${isOppositionGoal ? '<font color="red">Opposition Goal</font>' : 'Goal'}</strong>
-        ${isOppositionGoal ? '' : `: ${goalScorerName}, <strong>Assist:</strong> ${goalAssistName}`}
+        <strong>${isOppositionGoal ? `<font color="red"> ${team2Name} Goal</font>` : 'Goal:'}</strong>
+        ${isOppositionGoal ? '' : ` ${goalScorerName}, <strong>Assist:</strong> ${goalAssistName}`}
        </div>
         </div>`;
     })
     .join('');
 }
 
-//Update Score Board
+//Update Score Board Scores
 function updateScoreBoard(scorecard) {
   if (scorecard === 'first') {
-    elements.firstScoreElement.textContent = parseInt(elements.firstScoreElement.textContent) + 1;
+    const newScore = parseInt(elements.firstScoreElement.textContent) + 1;
+    elements.firstScoreElement.textContent = newScore;
+    Storage.save(STORAGE_KEYS.FIRST_SCORE, newScore);
   }
   if (scorecard === 'second') {
-    elements.secondScoreElement.textContent = parseInt(elements.secondScoreElement.textContent) + 1;
+    const newScore = parseInt(elements.secondScoreElement.textContent) + 1;
+    elements.secondScoreElement.textContent = newScore;
+    Storage.save(STORAGE_KEYS.SECOND_SCORE, newScore);
   }
  }
+//Update Score Board Teams
+function updatefixtureTeams(team,teamName) {
+  if (team === 'first') {
+    elements.Team1NameElement.textContent = teamName;
+    Storage.save(STORAGE_KEYS.TEAM1_NAME, teamName);
+    // Update input placeholder
+    const team1Input = document.getElementById('team1Name');
+    if (team1Input) team1Input.placeholder = teamName;
+  }
+  if (team === 'second') {
+    elements.Team2NameElement.textContent = teamName;
+    Storage.save(STORAGE_KEYS.TEAM2_NAME, teamName);
+    // Update input placeholder
+    const team2Input = document.getElementById('team2Name');
+    if (team2Input) team2Input.placeholder = teamName;
+  }
+}
 
 // Reset the tracker
 function resetTracker() {
@@ -229,6 +262,11 @@ function resetTracker() {
   timeSpan.className = 'timer-badge';
   timeSpan.textContent = "00:00";
   startPauseButton.appendChild(timeSpan);
+
+  // Reset scoreboard
+  elements.firstScoreElement.textContent = '0';
+  elements.secondScoreElement.textContent = '0';
+
   // Clear storage
   Storage.clear();
   //redirect to main tab
@@ -238,14 +276,16 @@ function resetTracker() {
 // Whatsapp Log Formatter
 function formatLogForWhatsApp() {
   const gameTime = formatTime(STATE.seconds);
-  const header = `⚽ Match Summary (Time: ${gameTime})\n\n`;
+  const team1Name = elements.Team1NameElement.textContent;
+  const team2Name = elements.Team2NameElement.textContent;
+  const header = `⚽ Match Summary: ${team1Name} vs ${team2Name} (Time: ${gameTime})\n\n`;
   
   const goals = STATE.data
     .sort((a, b) => a.rawTime - b.rawTime)
     .map(({ timestamp, goalScorerName, goalAssistName }) => {
-      const isOppositionGoal = goalScorerName === "Opposition Team";
+      const isOppositionGoal = goalScorerName === team2Name;
       return isOppositionGoal 
-        ? `❌ ${timestamp} - Opposition Goal`
+        ? `❌ ${timestamp} - ${team2Name} Goal`
         : `🥅 ${timestamp} - Goal: ${goalScorerName}, Assist: ${goalAssistName}`;
     })
     .join('\n');
@@ -326,6 +366,24 @@ function initializeApp() {
   STATE.startTimestamp = Storage.load(STORAGE_KEYS.START_TIMESTAMP, null);
   STATE.seconds = Storage.load(STORAGE_KEYS.ELAPSED_TIME, 0);
   STATE.data = Storage.load(STORAGE_KEYS.GOALS, []);
+
+    // Load saved scores
+    const firstScore = Storage.load(STORAGE_KEYS.FIRST_SCORE, 0);
+    const secondScore = Storage.load(STORAGE_KEYS.SECOND_SCORE, 0);
+    elements.firstScoreElement.textContent = firstScore;
+    elements.secondScoreElement.textContent = secondScore;
+
+    // Load saved team names
+    const team1Name = Storage.load(STORAGE_KEYS.TEAM1_NAME, 'Team 1');
+    const team2Name = Storage.load(STORAGE_KEYS.TEAM2_NAME, 'Team 2');
+    elements.Team1NameElement.textContent = team1Name;
+    elements.Team2NameElement.textContent = team2Name;
+
+    // Update input placeholders
+    const team1Input = document.getElementById('team1Name');
+    const team2Input = document.getElementById('team2Name');
+    if (team1Input) team1Input.placeholder = team1Name;
+    if (team2Input) team2Input.placeholder = team2Name;
   
   // If timer was running, calculate elapsed time and restart
   if (STATE.isRunning && STATE.startTimestamp) {
@@ -347,8 +405,29 @@ elements.goalForm.addEventListener('submit', addGoal);
 elements.opgoalButton.addEventListener('click', opaddGoal);
 elements.resetButton.addEventListener('click', resetTracker);
 elements.shareButton.addEventListener('click', shareToWhatsApp);
+elements.shareButton.addEventListener('click', shareToWhatsApp);
+elements.shareButton.addEventListener('click', shareToWhatsApp);
 document.addEventListener('DOMContentLoaded', initializeApp);
 document.addEventListener('DOMContentLoaded', fetchReadme);
+
+
+  // Update Team 1 button click handler
+  elements.updTeam1Btn.addEventListener('click', () => {
+    const newTeamName = elements.team1Input.value.trim();
+    if (newTeamName) {
+      updatefixtureTeams('first', newTeamName);
+      elements.team1Input.value = '';
+    }
+  });
+
+  // Update Team 2 button click handler
+  elements.updTeam2Btn.addEventListener('click', () => {
+    const newTeamName = elements.team2Input.value.trim();
+    if (newTeamName) {
+      updatefixtureTeams('second', newTeamName);
+      elements.team2Input.value = '';
+    }
+  });
 
 
 // Handle page visibility changes
