@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NUFC MatchTime App v3.0</title>
+  <title>NUFC GameTime App v3.0</title>
   <!-- Bootstrap CSS -->
   <link href="css/bootstrap.min.css" rel="stylesheet">
   <!-- Optional: Font Awesome for icons -->
@@ -22,7 +22,7 @@
         <!-- Header -->
         <div class="row mb-3">
           <div class="col-12">
-            <h3>NUFC MatchTime v3.0</h3>
+            <h3>NUFC GameTime v3.0</h3>
           </div>
         </div>
 
@@ -77,11 +77,11 @@
                   <div class="row">
                     <div class="col-6 text-center">
                       <h1 id="first-score">0</h1>
-                      <div id="first-team-name">Team 1</div>
+                      <div><button id="first-team-name" class="btn btn-link btn-custom" data-bs-toggle="modal" data-bs-target="#fixtureModalTeam1">Our Team</button></div>
                     </div>
                     <div class="col-6 text-center">
                       <h1 id="second-score">0</h1>
-                      <div id="second-team-name">Team 2</div>
+                      <div><button id="second-team-name" class="btn btn-link btn-custom" data-bs-toggle="modal" data-bs-target="#fixtureModalTeam2">Team 2</button></div>
                     </div>
                   </div>
                 </div>
@@ -104,11 +104,10 @@
                 <div class="card-body">
                   <h5 class="card-title"><i class="fa-solid fa-gears"></i> Config</h5><hr>
                   <p><button class="btn btn-danger btn-custom" data-bs-toggle="modal" data-bs-target="#rosterModal"><i class="fas fa-users"></i> My Team Management</button></p>
-                  <p><button class="btn btn-danger btn-custom" data-bs-toggle="modal" data-bs-target="#fixtureModal"><i class="fas fa-users"></i> Fixture Management</button></p>
                   <p><button class="btn btn-success btn-custom" id="shareButton"><i class="fas fa-share-alt me-2"></i>Send WhatsApp Report</button></p> 
                   <hr> 
                   <p><button class="btn btn-danger btn-custom" data-bs-toggle="modal" data-bs-target="#releasenotesmodal"><i class="fa-solid fa-list"></i> Release Notes</button>
-                  <p><button class="btn btn-danger btn-custom" data-bs-toggle="modal" data-bs-target="#resetConfirmModal"><i class="fa-solid fa-arrows-rotate"></i> Reset MatchTime App</button></p> 
+                  <p><button class="btn btn-danger btn-custom" data-bs-toggle="modal" data-bs-target="#resetConfirmModal"><i class="fa-solid fa-arrows-rotate"></i> Reset GameTime App</button></p> 
                 </div>
               </div>
             </div>
@@ -159,12 +158,12 @@
   </div>
 </div>
 
-<!-- Fixture Modal -->
-<div class="modal fade" id="fixtureModal" tabindex="-1">
+<!-- Fixture Modal Team 1 -->
+<div class="modal fade" id="fixtureModalTeam1" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Fixture Management</h5>
+        <h5 class="modal-title">Our Team Name Management</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
@@ -172,15 +171,37 @@
           <div class="col-12 col-md-8">
             <div class="input-group mb-3">
               <div>
-               <h5>Team 1:</h5>
-               <input type="text" id="team1Name" class="form-control" placeholder="Team 1">
-               </p></dp>
-               <button class="btn btn-danger btn-custom" id="updTeam1Btn">Update Team</button>
-               <hr>
-               <h5>Team 2:</h5>
+               <input type="text" id="team1Name" class="form-control" placeholder="Our Team">
+               </p></p>
+               <button class="btn btn-danger btn-custom" id="updTeam1Btn">Update Team Name</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Fixture Modal Team 2 -->
+<div class="modal fade" id="fixtureModalTeam2" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Team 2 Name Management</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-12 col-md-8">
+            <div class="input-group mb-3">
+              <div>
                <input type="text" id="team2Name" class="form-control" placeholder="Team 2">
-               </p></dp>
-               <button class="btn btn-danger btn-custom" id="updTeam2Btn">Update Team</button>
+               </p></p>
+               <button class="btn btn-danger btn-custom" id="updTeam2Btn">Update Team Name</button>
               </div>
             </div>
           </div>

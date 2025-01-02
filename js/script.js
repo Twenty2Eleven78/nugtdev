@@ -197,7 +197,7 @@ function updateLog() {
     .sort((a, b) => a.rawTime - b.rawTime)
     .map(({ timestamp, goalScorerName, goalAssistName }) => {
       const team2Name = elements.Team2NameElement.textContent;
-      const isOppositionGoal = goalScorerName === team2Name;
+      const isOppositionGoal = goalScorerName === team2Name || goalScorerName === 'Opposition Team';
       const cardClass = isOppositionGoal ? 'border-danger border-2' : 'border-success border-2'; // adds colour border to log
       
       return `<div class="card mb-2 ${cardClass}">
@@ -367,23 +367,23 @@ function initializeApp() {
   STATE.seconds = Storage.load(STORAGE_KEYS.ELAPSED_TIME, 0);
   STATE.data = Storage.load(STORAGE_KEYS.GOALS, []);
 
-    // Load saved scores
-    const firstScore = Storage.load(STORAGE_KEYS.FIRST_SCORE, 0);
-    const secondScore = Storage.load(STORAGE_KEYS.SECOND_SCORE, 0);
-    elements.firstScoreElement.textContent = firstScore;
-    elements.secondScoreElement.textContent = secondScore;
+  // Load saved scores
+  const firstScore = Storage.load(STORAGE_KEYS.FIRST_SCORE, 0);
+  const secondScore = Storage.load(STORAGE_KEYS.SECOND_SCORE, 0);
+  elements.firstScoreElement.textContent = firstScore;
+  elements.secondScoreElement.textContent = secondScore;
 
-    // Load saved team names
-    const team1Name = Storage.load(STORAGE_KEYS.TEAM1_NAME, 'Team 1');
-    const team2Name = Storage.load(STORAGE_KEYS.TEAM2_NAME, 'Team 2');
-    elements.Team1NameElement.textContent = team1Name;
-    elements.Team2NameElement.textContent = team2Name;
+  // Load saved team names
+  const team1Name = Storage.load(STORAGE_KEYS.TEAM1_NAME, 'Our Team');
+  const team2Name = Storage.load(STORAGE_KEYS.TEAM2_NAME, 'Opposition Team');
+  elements.Team1NameElement.textContent = team1Name;
+  elements.Team2NameElement.textContent = team2Name;
 
-    // Update input placeholders
-    const team1Input = document.getElementById('team1Name');
-    const team2Input = document.getElementById('team2Name');
-    if (team1Input) team1Input.placeholder = team1Name;
-    if (team2Input) team2Input.placeholder = team2Name;
+  // Update input placeholders
+  const team1Input = document.getElementById('team1Name');
+  const team2Input = document.getElementById('team2Name');
+  if (team1Input) team1Input.placeholder = team1Name;
+  if (team2Input) team2Input.placeholder = team2Name;
   
   // If timer was running, calculate elapsed time and restart
   if (STATE.isRunning && STATE.startTimestamp) {
