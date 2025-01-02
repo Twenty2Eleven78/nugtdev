@@ -1,4 +1,4 @@
-<font color="red"<b>NUFC MatchTime App Release Notes</b></font>
+<font color="red"<b>NUFC GameTime App Release Notes</b></font>
 <br><br>
 <li>1.0 - Initial working application modal</li>
 <li>1.1 - layout Changes</li>
