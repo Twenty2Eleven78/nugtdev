@@ -191,6 +191,12 @@ updateScoreBoard('second');
     // Reset form
   elements.goalForm.reset();
 }
+
+function closeGoalModal() {
+  document.getElementById('goalModalClose').click();
+  return false;
+}
+
 // Update Goal Log
 function updateLog() {
   elements.log.innerHTML = STATE.data
