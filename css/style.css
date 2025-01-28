@@ -97,3 +97,34 @@ body {
   border-radius: 4px;
   overflow-x: auto;
 }
+
+.modal-fullscreen-sm-down {
+  padding: 0 !important;
+}
+
+.modal-fullscreen-sm-down .modal-content {
+  height: 100vh;
+}
+
+.modal-fullscreen-sm-down .modal-body {
+  overflow-y: auto;
+}
+
+.custom-select {
+  appearance: revert;
+  -webkit-appearance: menulist !important;
+  -moz-appearance: menulist !important;
+  background-image: none !important;
+  padding: 0.375rem 0.75rem !important;
+  background-color: #fff !important;
+  border: 1px solid #ced4da !important;
+  border-radius: 0.25rem !important;
+  width: 100% !important;
+  color: #212529 !important;
+}
+
+.custom-select:focus {
+  border-color: #86b7fe !important;
+  outline: 0 !important;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+}
