@@ -1,154 +1,257 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Timer Button Demos</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            padding: 20px;
-        }
-        .timer-btn-inline {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            transition: all 0.3s ease;
-        }
-        .timer-badge {
-            background-color: rgba(255,255,255,0.2);
-            padding: 2px 8px;
-            border-radius: 15px;
-        }
-        .timer-badge-active {
-            background-color: rgba(255,255,255,0.3);
-        }
-        .tab-content {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
+// Add these to the STATE object
+const STATE = {
+  // ... existing state ...
+  matchEvents: [], // For storing non-goal events
+};
+
+// Add to STORAGE_KEYS
+const STORAGE_KEYS = {
+  // ... existing keys ...
+  MATCH_EVENTS: 'goalTracker_matchEvents',
+};
+
+// Add event handlers
+function addMatchEvent(eventType) {
+  const currentSeconds = getCurrentSeconds();
+  const eventData = {
+    timestamp: Math.ceil(currentSeconds / 60),
+    type: eventType,
+    rawTime: currentSeconds
+  };
+  
+  STATE.matchEvents.push(eventData);
+  updateLog();
+  Storage.save(STORAGE_KEYS.MATCH_EVENTS, STATE.matchEvents);
 }
 
-.tab {
-    display: none;
-}
-
-.tab-nav {
-    display: flex;
-    justify-content: space-around;
-}
-
-/* Show the initial tab */
-#roster {
-    display: block;
-}
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h2>Timer Button</h2>
+// Modify updateLog function to include all events
+function updateLog() {
+  // Combine goals and match events
+  const allEvents = [...STATE.data, ...STATE.matchEvents]
+    .sort((a, b) => a.rawTime - b.rawTime)
+    .map(event => {
+      if (event.type) {
+        // Match event
+        const cardClass = getEventCardClass(event.type);
+        const icon = getEventIcon(event.type);
+        return `<div class="card mb-2 ${cardClass}">
+          <div class="card-body p-2">
+            <span>${event.timestamp}'</span> - ${icon} <strong>${event.type}</strong>
+          </div>
+        </div>`;
+      } else {
+        // Goal event (existing logic)
+        const team2Name = elements.Team2NameElement.textContent;
+        const isOppositionGoal = event.goalScorerName === team2Name || event.goalScorerName === 'Opposition Team';
+        const cardClass = isOppositionGoal ? 'border-danger border-2' : 'border-success border-2';
         
-        <div class="row">
-            <div class="col-md-6">
-                <button id="inlineTimerBtn" class="btn btn-danger timer-btn-inline">
-                    Start Game
-                    <span id="inlineTime" class="timer-badge">00:00</span>
-                </button>
-            </div>
-        </div>
+        return `<div class="card mb-2 ${cardClass}">
+          <div class="card-body p-2">
+            <span>${event.timestamp}</span>' - 
+            <strong>${isOppositionGoal ? `<font color="red"> ${team2Name} Goal</font>` : 'Goal:'}</strong>
+            ${isOppositionGoal ? '' : ` ${event.goalScorerName}, <strong>Assist:</strong> ${event.goalAssistName}`}
+          </div>
+        </div>`;
+      }
+    })
+    .join('');
+    
+  elements.log.innerHTML = allEvents;
+}
+
+// Helper functions
+function getEventCardClass(eventType) {
+  switch(eventType) {
+    case 'Half Time':
+    case 'Full Time':
+      return 'border-primary border-2';
+    case 'Foul':
+    case 'Penalty':
+      return 'border-warning border-2';
+    default:
+      return 'border-secondary border-2';
+  }
+}
+
+function getEventIcon(eventType) {
+  switch(eventType) {
+    case 'Half Time':
+      return '⏸️';
+    case 'Full Time':
+      return '🏁';
+    case 'Foul':
+      return '🟨';
+    case 'Penalty':
+      return '⚠️';
+    default:
+      return '📝';
+  }
+}
+
+// Add to initializeApp
+function initializeApp() {
+  // ... existing initialization ...
+  STATE.matchEvents = Storage.load(STORAGE_KEYS.MATCH_EVENTS, []);
+  
+  // Add event listeners for new buttons
+  document.getElementById('HalfTimeButton').addEventListener('click', () => addMatchEvent('Half Time'));
+  document.getElementById('FullTimeButton').addEventListener('click', () => addMatchEvent('Full Time'));
+  document.getElementById('FoulButton').addEventListener('click', () => addMatchEvent('Foul'));
+  document.getElementById('PenaltyButton').addEventListener('click', () => addMatchEvent('Penalty'));
+}
+
+// Modify resetTracker to include match events
+function resetTracker() {
+  // ... existing reset logic ...
+  STATE.matchEvents = [];
+  // ... rest of reset logic ...
+}
+
+// Modify WhatsApp formatter to include match events
+function formatLogForWhatsApp() {
+  const gameTime = formatTime(STATE.seconds);
+  const team1Name = elements.Team1NameElement.textContent;
+  const team2Name = elements.Team2NameElement.textContent;
+  const header = `⚽ Match Summary: ${team1Name} vs ${team2Name} (Time: ${gameTime})\n\n`;
+  
+  const allEvents = [...STATE.data, ...STATE.matchEvents]
+    .sort((a, b) => a.rawTime - b.rawTime)
+    .map(event => {
+      if (event.type) {
+        // Match event
+        const icon = getEventIcon(event.type);
+        return `${icon} ${event.timestamp}' - ${event.type}`;
+      } else {
+        // Goal event (existing logic)
+        const isOppositionGoal = event.goalScorerName === team2Name;
+        return isOppositionGoal 
+          ? `❌ ${event.timestamp}' - ${team2Name} Goal`
+          : `🥅 ${event.timestamp}' - Goal: ${event.goalScorerName}, Assist: ${event.goalAssistName}`;
+      }
+    })
+    .join('\n');
+    
+  const stats = generateStats();
+  return encodeURIComponent(`${header}${allEvents}\n\n${stats}`);
+
+
+
+
+  -----------------------------------
+
+
+
+  <!-- Game Actions Card -->
+<div class="card">
+  <div class="card-body">
+    <h5 class="card-title"><i class="fa-regular fa-futbol"></i> Game Actions</h5><hr>
+    
+    <!-- Goals Section -->
+    <div class="row mb-3">
+      <h6 class="text-muted mb-2">⚽ Goals</h6>
+      <div class="col-6">
+        <button id="goalButton" class="btn btn-success w-100" data-bs-toggle="modal" data-bs-target="#goalModal">
+          <i class="fa-solid fa-futbol me-2"></i>Netherton Goal
+        </button>
+      </div>
+      <div class="col-6">
+        <button class="btn btn-danger w-100" type="button" id="opgoalButton">
+          <i class="fa-solid fa-futbol me-2"></i>Opposition Goal
+        </button>
+      </div>
     </div>
     
-
-    <div class="tab-content">
-        <div id="roster" class="tab">
-            </div>
-        <div id="goal-log" class="tab">
-            </div>
-        <div id="reset" class="tab">
-            </div>
-        <div id="whatsapp" class="tab">
-            </div>
+    <!-- Match Control Section -->
+    <div class="row mb-3">
+      <h6 class="text-muted mb-2">⏱️ Match Control</h6>
+      <div class="col-6">
+        <button class="btn btn-primary w-100 mb-2" type="button" id="HalfTimeButton">
+          <i class="fa-solid fa-stopwatch me-2"></i>Half Time
+        </button>
+      </div>
+      <div class="col-6">
+        <button class="btn btn-primary w-100 mb-2" type="button" id="FullTimeButton">
+          <i class="fa-solid fa-flag-checkered me-2"></i>Full Time
+        </button>
+      </div>
     </div>
-
-    <div class="tab-nav">
-        <button id="roster-tab">Roster</button>
-        <button id="goal-log-tab">Goal Log</button>
-        <button id="reset-tab">Reset</button>
-        <button id="whatsapp-tab">WhatsApp</button>
+    
+    <!-- Incidents Section -->
+    <div class="row">
+      <h6 class="text-muted mb-2">📝 Incidents</h6>
+      <div class="col-6">
+        <button class="btn btn-warning w-100" type="button" id="FoulButton">
+          <i class="fa-solid fa-hand me-2"></i>Foul
+        </button>
+      </div>
+      <div class="col-6">
+        <button class="btn btn-warning w-100" type="button" id="PenaltyButton">
+          <i class="fa-solid fa-circle-exclamation me-2"></i>Penalty
+        </button>
+      </div>
     </div>
+  </div>
+</div>
 
-    <script>
-        // Inline Timer
-        (function() {
-            const btn = document.getElementById('inlineTimerBtn');
-            const timeDisplay = document.getElementById('inlineTime');
-            let startTime, timerInterval;
+<!-- Add this CSS to your style.css file -->
+<style>
+.card-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
 
-            btn.addEventListener('click', function() {
-                if (!timerInterval) {
-                    // Start timer
-                    startTime = Date.now();
-                    timerInterval = setInterval(updateTimer, 1000);
-                    
-                    // Change button theme
-                    btn.classList.remove('btn-danger');
-                    btn.classList.add('btn-success');
-                    btn.textContent = 'Game in Progress';
-                    
-                    // Add text back
-                    const timeSpan = document.createElement('span');
-                    timeSpan.id = 'inlineTime';
-                    timeSpan.className = 'timer-badge';
-                    timeSpan.textContent = '00:00';
-                    btn.appendChild(timeSpan);
-                } else {
-                    // Stop timer
-                    clearInterval(timerInterval);
-                    timerInterval = null;
-                    
-                    // Revert button theme
-                    btn.classList.remove('btn-success');
-                    btn.classList.add('btn-danger');
-                    btn.textContent = 'Start Game';
-                    
-                    // Reset time display
-                    const timeSpan = document.createElement('span');
-                    timeSpan.id = 'inlineTime';
-                    timeSpan.className = 'timer-badge';
-                    timeSpan.textContent = '00:00';
-                    btn.appendChild(timeSpan);
-                }
-            });
+.btn {
+  padding: 0.75rem 1rem;
+  font-weight: 500;
+  text-transform: none;
+  border-radius: 0.5rem;
+}
 
-            function updateTimer() {
-                const elapsedTime = Date.now() - startTime;
-                const seconds = Math.floor(elapsedTime / 1000);
-                const minutes = Math.floor(seconds / 60);
-                const displaySeconds = seconds % 60;
+.btn i {
+  font-size: 1rem;
+}
 
-                const formattedTime = `${minutes.toString().padStart(2, '0')}:${displaySeconds.toString().padStart(2, '0')}`;
-                
-                // Find and update the time display
-                const existingTimeDisplay = btn.querySelector('#inlineTime');
-                if (existingTimeDisplay) {
-                    existingTimeDisplay.textContent = formattedTime;
-                }
-            }
-        })();
+h6.text-muted {
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding-left: 0.5rem;
+}
 
-        const tabs = document.querySelectorAll('.tab');
-const navButtons = document.querySelectorAll('.tab-nav button');
+/* Button hover effects */
+.btn-success:hover {
+  background-color: #198754;
+  transform: translateY(-1px);
+  transition: all 0.2s;
+}
 
-navButtons.forEach(button => {
-    button.addEventListener('click', () => {
-        const tabId = button.id.replace('-tab', '');
-        tabs.forEach(tab => {
-            tab.style.display = 'none';
-        });
-        document.getElementById(tabId).style.display = 'block';
-    });
-});
+.btn-danger:hover {
+  background-color: #dc3545;
+  transform: translateY(-1px);
+  transition: all 0.2s;
+}
 
-    </script>
-</body>
-</html>
+.btn-primary:hover {
+  background-color: #0d6efd;
+  transform: translateY(-1px);
+  transition: all 0.2s;
+}
+
+.btn-warning:hover {
+  background-color: #ffc107;
+  transform: translateY(-1px);
+  transition: all 0.2s;
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+  .btn {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+  }
+  
+  .btn i {
+    font-size: 0.875rem;
+  }
+}
+</style>
+}

@@ -31,6 +31,7 @@
           <div class="tab-content" id="gametab-content">
             <!-- Game Tab -->
             <div class="tab-pane fade show active" id="gametab">
+              
               <!-- Game Timer Card -->
               <div class="card">
                 <div class="card-body">
@@ -47,7 +48,7 @@
               <!-- Game Actions Card -->
               <div class="card">
                 <div class="card-body">
-                  <h5 class="card-title"><i class="fa-regular fa-futbol"></i> Game Actions</h5>
+                  <h5 class="card-title"><i class="fa-regular fa-futbol"></i> Game Actions</h5><hr>
                   <!--<form id="goalForm">
                     <div class="mb-3">
                       <label for="goalScorer" class="form-label">Goal Scorer:</label>
@@ -62,14 +63,46 @@
                         <option value="N/A">N/A</option>
                       </select>
                     </div>-->
-                    <div class="d-flex gap-2">
-                      <!--<button type="submit" class="btn btn-success btn-custom" id="goalButton">Our Goal</button>-->
-                      <button id="goalButton" class="btn btn-success btn-custom" data-bs-toggle="modal" data-bs-target="#goalModal">Team Goal</button>
-                      <button class="btn btn-danger btn-custom" type="button" id="opgoalButton">Opposition Goal</button>
+
+                    <div class="container-fluid p-0">
+                      <!-- Goals Row -->
+                      <div class="row g-2 mb-3">
+                        <div class="col-6">
+                          <button id="goalButton" class="btn btn-success w-100" data-bs-toggle="modal" data-bs-target="#goalModal">
+                            <i class="fa-solid fa-futbol me-2"></i>Netherton
+                          </button>
+                        </div>
+                        <div class="col-6">
+                          <button id="opgoalButton" class="btn btn-danger w-100" type="button">
+                            <i class="fa-solid fa-futbol me-2"></i>Opposition
+                          </button>
+                        </div>
+                      </div>
+                
+                      <!-- Time Markers Row -->
+                      <div class="row g-2 mb-3">
+                        <div class="col-6">
+                          <button id="HalfTimeButton" class="btn btn-success w-100" type="button"><i class="fa-solid fa-stopwatch me-2"></i>Half Time</button>
+                        </div>
+                        <div class="col-6">
+                          <button id="FullTimeButton" class="btn btn-success w-100" type="button"><i class="fa-solid fa-stopwatch me-2"></i>Full Time</button>
+                        </div>
+                      </div>
+                
+                      <!-- Fouls Row -->
+                      <div class="row g-2">
+                        <div class="col-6">
+                          <button id="IncidentButton" class="btn btn-danger w-100" type="button"><i class="fa-solid fa-hand me-2"></i>Incident</button>
+                        </div>
+                        <div class="col-6">
+                          <button id="PenaltyButton" class="btn btn-danger w-100" type="button"><i class="fa-solid fa-circle-exclamation me-2"></i>Penalty</button>
+                        </div>
+                      </div>
                     </div>
-                  </form>
+                  </div>
+                  <!--</form>-->
                 </div>
-              </div>
+              
 
               <!-- Score Board Card -->
               <div class="card" id="scoreboard">
@@ -78,11 +111,11 @@
                   <div class="row">
                     <div class="col-6 text-center">
                       <h1 id="first-score">0</h1>
-                      <div><button id="first-team-name" class="btn btn-link btn-custom" data-bs-toggle="modal" data-bs-target="#fixtureModalTeam1">Our Team</button></div>
+                      <div><button id="first-team-name" class="btn btn-link btn-custom" data-bs-toggle="modal" data-bs-target="#fixtureModalTeam1">Netherton</button></div>
                     </div>
                     <div class="col-6 text-center">
                       <h1 id="second-score">0</h1>
-                      <div><button id="second-team-name" class="btn btn-link btn-custom" data-bs-toggle="modal" data-bs-target="#fixtureModalTeam2">Team 2</button></div>
+                      <div><button id="second-team-name" class="btn btn-link btn-custom" data-bs-toggle="modal" data-bs-target="#fixtureModalTeam2">Opposition Team</button></div>
                     </div>
                   </div>
                 </div>
@@ -99,11 +132,11 @@
               </div>
             </div>
 
-            <!-- Config Tab -->
-            <div class="tab-pane fade" id="configtab">
+            <!-- Options Tab -->
+            <div class="tab-pane fade" id="optionstab">
               <div class="card">
                 <div class="card-body">
-                  <h5 class="card-title"><i class="fa-solid fa-gears"></i> Config</h5><hr>
+                  <h5 class="card-title"><i class="fa-solid fa-gears"></i> Options</h5><hr>
                   <p><button class="btn btn-danger btn-custom" data-bs-toggle="modal" data-bs-target="#rosterModal"><i class="fas fa-users"></i> My Team Management</button></p>
                   <p><button class="btn btn-success btn-custom" id="shareButton"><i class="fas fa-share-alt me-2"></i>Send WhatsApp Report</button></p> 
                   <hr> 
@@ -133,8 +166,8 @@
           </a>
         </li>
         <li class="nav-item pill-3">
-          <a class="nav-link" data-bs-toggle="pill" href="#configtab">
-            <i class="fa-solid fa-gears"></i> <b>Config</b>
+          <a class="nav-link" data-bs-toggle="pill" href="#optionstab">
+            <i class="fa-solid fa-gears"></i> <b>Options</b>
           </a>
         </li>
       </ul>
@@ -172,7 +205,7 @@
           <div class="col-12 col-md-8">
             <div class="input-group mb-3">
               <div>
-               <input type="text" id="team1Name" class="form-control" placeholder="Our Team">
+               <input type="text" id="team1Name" class="form-control" placeholder="Netherton">
                </p></p>
                <button class="btn btn-danger btn-custom" id="updTeam1Btn">Update Team Name</button>
               </div>
@@ -200,7 +233,7 @@
           <div class="col-12 col-md-8">
             <div class="input-group mb-3">
               <div>
-               <input type="text" id="team2Name" class="form-control" placeholder="Team 2">
+               <input type="text" id="team2Name" class="form-control" placeholder="Opposition Team">
                </p></p>
                <button class="btn btn-danger btn-custom" id="updTeam2Btn">Update Team Name</button>
               </div>

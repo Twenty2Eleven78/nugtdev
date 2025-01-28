@@ -5,7 +5,7 @@ const STATE = {
   intervalId: null,
   data: [],
   startTimestamp: null,
- 
+  matchEvents: [],
 };
  
 // DOM Elements
@@ -39,7 +39,8 @@ const STORAGE_KEYS = {
   FIRST_SCORE: 'goalTracker_firstScore',    
   SECOND_SCORE: 'goalTracker_secondScore',
   TEAM1_NAME: 'goalTracker_team1name',    
-  TEAM2_NAME: 'goalTracker_team2name'    
+  TEAM2_NAME: 'goalTracker_team2name',
+  MATCH_EVENTS: 'goalTracker_matchEvents'    
 };
 
 // Local Storage utilities
@@ -192,6 +193,21 @@ updateScoreBoard('second');
   elements.goalForm.reset();
 }
 
+// Add event handlers
+function addMatchEvent(eventType) {
+  const currentSeconds = getCurrentSeconds();
+  const eventData = {
+    timestamp: Math.ceil(currentSeconds / 60),
+    type: eventType,
+    rawTime: currentSeconds
+  };
+  
+  STATE.matchEvents.push(eventData);
+  updateLog();
+  Storage.save(STORAGE_KEYS.MATCH_EVENTS, STATE.matchEvents);
+}
+
+
 function closeGoalModal() {
   document.getElementById('goalModalClose').click();
   return false;
@@ -199,22 +215,36 @@ function closeGoalModal() {
 
 // Update Goal Log
 function updateLog() {
-  elements.log.innerHTML = STATE.data
+  const allEvents = [...STATE.data, ...STATE.matchEvents]
     .sort((a, b) => a.rawTime - b.rawTime)
-    .map(({ timestamp, goalScorerName, goalAssistName }) => {
-      const team2Name = elements.Team2NameElement.textContent;
-      const isOppositionGoal = goalScorerName === team2Name || goalScorerName === 'Opposition Team';
-      const cardClass = isOppositionGoal ? 'border-danger border-2' : 'border-success border-2'; // adds colour border to log
-      
-      return `<div class="card mb-2 ${cardClass}">
-        <div class="card-body p-2">
-        <span>${timestamp}</span>' -  
-        <strong>${isOppositionGoal ? `<font color="red"> ${team2Name} Goal</font>` : 'Goal:'}</strong>
-        ${isOppositionGoal ? '' : ` ${goalScorerName}, <strong>Assist:</strong> ${goalAssistName}`}
-       </div>
+    .map(event => {
+      if (event.type) {
+        // Match event
+        const cardClass = getEventCardClass(event.type);
+        const icon = getEventIcon(event.type);
+        return `<div class="card mb-2 ${cardClass}">
+          <div class="card-body p-2">
+            <span>${event.timestamp}'</span> - ${icon} <strong>${event.type}</strong>
+          </div>
         </div>`;
+      } else {
+        // Goal event (existing logic)
+        const team2Name = elements.Team2NameElement.textContent;
+        const isOppositionGoal = event.goalScorerName === team2Name || event.goalScorerName === 'Opposition Team';
+        const cardClass = isOppositionGoal ? 'border-danger border-2' : 'border-success border-2';
+        
+        return `<div class="card mb-2 ${cardClass}">
+          <div class="card-body p-2">
+            <span>${event.timestamp}</span>' - 
+            <strong>${isOppositionGoal ? `<font color="red"> ${team2Name} Goal</font>` : 'Goal:'}</strong>
+            ${isOppositionGoal ? '' : ` ${event.goalScorerName}, <strong>Assist:</strong> ${event.goalAssistName}`}
+          </div>
+        </div>`;
+      }
     })
     .join('');
+    
+  elements.log.innerHTML = allEvents;
 }
 
 //Update Score Board Scores
@@ -241,6 +271,7 @@ function updatefixtureTeams(team,teamName) {
   }
   if (team === 'second') {
     elements.Team2NameElement.textContent = teamName;
+    elements.opgoalButton.textContent = teamName;
     Storage.save(STORAGE_KEYS.TEAM2_NAME, teamName);
     // Update input placeholder
     const team2Input = document.getElementById('team2Name');
@@ -256,6 +287,7 @@ function resetTracker() {
   STATE.isRunning = false;
   STATE.data = [];
   STATE.startTimestamp = null;
+  STATE.matchEvents = [];
   
   // Reset UI
   updateStopwatchDisplay();
@@ -286,18 +318,25 @@ function formatLogForWhatsApp() {
   const team2Name = elements.Team2NameElement.textContent;
   const header = `⚽ Match Summary: ${team1Name} vs ${team2Name} (Time: ${gameTime})\n\n`;
   
-  const goals = STATE.data
+  const allEvents = [...STATE.data, ...STATE.matchEvents]
     .sort((a, b) => a.rawTime - b.rawTime)
-    .map(({ timestamp, goalScorerName, goalAssistName }) => {
-      const isOppositionGoal = goalScorerName === team2Name;
-      return isOppositionGoal 
-        ? `❌ ${timestamp} - ${team2Name} Goal`
-        : `🥅 ${timestamp} - Goal: ${goalScorerName}, Assist: ${goalAssistName}`;
+    .map(event => {
+      if (event.type) {
+        // Match event
+        const icon = getEventIcon(event.type);
+        return `${icon} ${event.timestamp}' - ${event.type}`;
+      } else {
+        // Goal event (existing logic)
+        const isOppositionGoal = event.goalScorerName === team2Name;
+        return isOppositionGoal 
+          ? `❌ ${event.timestamp}' - ${team2Name} Goal`
+          : `🥅 ${event.timestamp}' - Goal: ${event.goalScorerName}, Assist: ${event.goalAssistName}`;
+      }
     })
     .join('\n');
     
   const stats = generateStats();
-  return encodeURIComponent(`${header}${goals}\n\n${stats}`);
+  return encodeURIComponent(`${header}${allEvents}\n\n${stats}`);
 }
 // Whatsapp statistics summary 
 function generateStats() {
@@ -360,6 +399,35 @@ function fetchReadme() {
       });
 }
 
+// Event Helper functions
+function getEventCardClass(eventType) {
+  switch(eventType) {
+    case 'Half Time':
+    case 'Full Time':
+      return 'border-primary border-2';
+    case 'Foul':
+    case 'Penalty':
+      return 'border-warning border-2';
+    default:
+      return 'border-secondary border-2';
+  }
+}
+
+function getEventIcon(eventType) {
+  switch(eventType) {
+    case 'Half Time':
+      return '⏸️';
+    case 'Full Time':
+      return '🏁';
+    case 'Foul':
+      return '🟨';
+    case 'Penalty':
+      return '⚠️';
+    default:
+      return '📝';
+  }
+}
+
 // Initialize application
 function initializeApp() {
 	
@@ -372,6 +440,7 @@ function initializeApp() {
   STATE.startTimestamp = Storage.load(STORAGE_KEYS.START_TIMESTAMP, null);
   STATE.seconds = Storage.load(STORAGE_KEYS.ELAPSED_TIME, 0);
   STATE.data = Storage.load(STORAGE_KEYS.GOALS, []);
+  STATE.matchEvents = Storage.load(STORAGE_KEYS.MATCH_EVENTS, []);
 
   // Load saved scores
   const firstScore = Storage.load(STORAGE_KEYS.FIRST_SCORE, 0);
@@ -380,7 +449,7 @@ function initializeApp() {
   elements.secondScoreElement.textContent = secondScore;
 
   // Load saved team names
-  const team1Name = Storage.load(STORAGE_KEYS.TEAM1_NAME, 'Our Team');
+  const team1Name = Storage.load(STORAGE_KEYS.TEAM1_NAME, 'Netherton');
   const team2Name = Storage.load(STORAGE_KEYS.TEAM2_NAME, 'Opposition Team');
   elements.Team1NameElement.textContent = team1Name;
   elements.Team2NameElement.textContent = team2Name;
@@ -411,10 +480,12 @@ elements.goalForm.addEventListener('submit', addGoal);
 elements.opgoalButton.addEventListener('click', opaddGoal);
 elements.resetButton.addEventListener('click', resetTracker);
 elements.shareButton.addEventListener('click', shareToWhatsApp);
-elements.shareButton.addEventListener('click', shareToWhatsApp);
-elements.shareButton.addEventListener('click', shareToWhatsApp);
 document.addEventListener('DOMContentLoaded', initializeApp);
 document.addEventListener('DOMContentLoaded', fetchReadme);
+document.getElementById('HalfTimeButton').addEventListener('click', () => addMatchEvent('Half Time'));
+document.getElementById('FullTimeButton').addEventListener('click', () => addMatchEvent('Full Time'));
+document.getElementById('IncidentButton').addEventListener('click', () => addMatchEvent('Incident'));
+document.getElementById('PenaltyButton').addEventListener('click', () => addMatchEvent('Penalty'));
 
 
   // Update Team 1 button click handler
