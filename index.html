@@ -234,7 +234,7 @@
 
 <!-- Goal Modal -->
 <div class="modal fade" id="goalModal" tabindex="-1">
-  <div class="modal-dialog modal-dialog-scrollable modal-fullscreen-sm-down">
+  <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Goal Details:</h5>
@@ -247,14 +247,14 @@
               <form id="goalForm" onsubmit="return closeGoalModal();" class="w-100">
                 <div class="mb-3">
                   <label for="goalScorer" class="form-label">Goal Scorer:</label>
-                  <select id="goalScorer" class="form-select custom-select" required>
+                  <select id="goalScorer" class="form-select " required>
                     <option value="" disabled selected>Select goal scorer</option>
                   </select>
                 </div>
                 <div class="mb-3">
                   <label for="goalAssist" class="form-label">Goal Assist:</label>
-                  <select id="goalAssist" class="form-select custom-select" required>
-                    <option value="" selected>Select goal assist</option>
+                  <select id="goalAssist" class="form-select" required>
+                    <!--<option value="" selected>Select goal assist</option>-->
                     <option value="N/A">N/A</option>
                   </select>
                 </div>
