@@ -434,21 +434,35 @@ function getEventIcon(eventType) {
 // notification helper
 function showNotification(message, type = 'success') {
   const container = document.getElementById('notification-container');
+  
+  // Remove any existing notifications
+  while (container.firstChild) {
+    container.removeChild(container.firstChild);
+  }
+  
   const notification = document.createElement('div');
   notification.className = `notification ${type}`;
   notification.textContent = message;
   
   container.appendChild(notification);
   
-  // Trigger fade out
+  // Trigger slide down animation
+  requestAnimationFrame(() => {
+    notification.classList.add('show');
+  });
+  
+  // Start fade out
   setTimeout(() => {
     notification.style.opacity = '0';
+    notification.style.transform = 'translateY(-100%)';
   }, 2000);
   
   // Remove the element after animation
   setTimeout(() => {
-    container.removeChild(notification);
-  }, 2600);
+    if (container.contains(notification)) {
+      container.removeChild(notification);
+    }
+  }, 2300);
 }
 
 // Initialize application
