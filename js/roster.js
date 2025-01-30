@@ -89,9 +89,9 @@ const RosterManager = (function() {
             <tr>
               <td>${player}</td>
               <td>
-                <button class="btn-small red waves-effect waves-light remove-player" 
+                <button class="btn btn-sm btn-outline-danger " 
                         data-player="${player}">
-                  Remove
+                  <i class="fas fa-trash"></i>
                 </button>
               </td>
             </tr>
