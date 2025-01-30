@@ -217,6 +217,21 @@ function closeGoalModal() {
 
 // Update Goal Log
 function updateLog() {
+
+  // Create separate arrays for each type with their original indices
+  const goalEntries = STATE.data.map((event, index) => ({
+    ...event,
+    originalIndex: index,
+    type: 'goal'
+  }));
+  
+  const eventEntries = STATE.matchEvents.map((event, index) => ({
+    ...event,
+    originalIndex: index,
+    type: 'matchEvent'
+  }));
+
+
   const allEvents = [...STATE.data, ...STATE.matchEvents]
     .sort((a, b) => a.rawTime - b.rawTime)
     .map(event => {
@@ -225,8 +240,15 @@ function updateLog() {
         const cardClass = getEventCardClass(event.type);
         const icon = getEventIcon(event.type);
         return `<div class="card mb-2 ${cardClass}">
-          <div class="card-body p-2">
-            <span>${event.timestamp}'</span> - ${icon} <strong>${event.type}</strong>
+          <div class="card-body p-2 d-flex justify-content-between align-items-center">
+            <div>
+              <span>${event.timestamp}'</span> - ${icon} <strong>${event.type}</strong>
+            </div>
+            <button class="btn btn-sm btn-outline-danger" 
+              onclick="deleteLogEntry(${event.originalIndex}, 'event')" 
+              aria-label="Delete event">
+              <i class="fas fa-trash"></i>
+            </button>
           </div>
         </div>`;
       } else {
@@ -236,10 +258,17 @@ function updateLog() {
         const cardClass = isOppositionGoal ? 'border-danger border-2' : 'border-success border-2';
         
         return `<div class="card mb-2 ${cardClass}">
-          <div class="card-body p-2">
-            <span>${event.timestamp}</span>' - 
-            <strong>${isOppositionGoal ? `<font color="red"> ${team2Name} Goal</font>` : 'Goal:'}</strong>
-            ${isOppositionGoal ? '' : ` ${event.goalScorerName}, <strong>Assist:</strong> ${event.goalAssistName}`}
+          <div class="card-body p-2 d-flex justify-content-between align-items-center">
+            <div>
+              <span>${event.timestamp}'</span> - 
+              <strong>${isOppositionGoal ? `<font color="red"> ${team2Name} Goal</font>` : 'Goal:'}</strong>
+              ${isOppositionGoal ? '' : ` ${event.goalScorerName}, <strong>Assist:</strong> ${event.goalAssistName}`}
+            </div>
+            <button class="btn btn-sm btn-outline-danger" 
+              onclick="deleteLogEntry(${event.originalIndex}, 'goal')" 
+              aria-label="Delete goal">
+              <i class="fas fa-trash"></i>
+            </button>
           </div>
         </div>`;
       }
@@ -247,6 +276,31 @@ function updateLog() {
     .join('');
     
   elements.log.innerHTML = allEvents;
+}
+
+//
+function deleteLogEntry(index, type) {
+  if (type === 'goal') {
+    STATE.data.splice(index, 1);
+    Storage.save(STORAGE_KEYS.GOALS, STATE.data);
+    
+    // Recalculate score
+    const team2Name = elements.Team2NameElement.textContent;
+    const teamGoals = STATE.data.filter(goal => goal.goalScorerName !== team2Name).length;
+    const oppositionGoals = STATE.data.filter(goal => goal.goalScorerName === team2Name).length;
+    
+    elements.firstScoreElement.textContent = teamGoals;
+    elements.secondScoreElement.textContent = oppositionGoals;
+    
+    Storage.save(STORAGE_KEYS.FIRST_SCORE, teamGoals);
+    Storage.save(STORAGE_KEYS.SECOND_SCORE, oppositionGoals);
+  } else if (type === 'event') {
+    STATE.matchEvents.splice(index, 1);
+    Storage.save(STORAGE_KEYS.MATCH_EVENTS, STATE.matchEvents);
+  }
+  
+  updateLog();
+  showNotification('Entry deleted', 'info');
 }
 
 //Update Score Board Scores
@@ -262,6 +316,7 @@ function updateScoreBoard(scorecard) {
     Storage.save(STORAGE_KEYS.SECOND_SCORE, newScore);
   }
  }
+
 //Update Score Board Teams
 function updatefixtureTeams(team,teamName) {
   if (team === 'first') {
@@ -332,7 +387,7 @@ function formatLogForWhatsApp() {
         // Goal event (existing logic)
         const isOppositionGoal = event.goalScorerName === team2Name;
         return isOppositionGoal 
-          ? `❌ ${event.timestamp}' - ${team2Name} Goal`
+          ? `🥅 ${event.timestamp}' - ${team2Name} Goal`
           : `🥅 ${event.timestamp}' - Goal: ${event.goalScorerName}, Assist: ${event.goalAssistName}`;
       }
     })
@@ -341,6 +396,7 @@ function formatLogForWhatsApp() {
   const stats = generateStats();
   return encodeURIComponent(`${header}${allEvents}\n\n${stats}`);
 }
+
 // Whatsapp statistics summary 
 function generateStats() {
   const stats = new Map();
@@ -376,6 +432,7 @@ function generateStats() {
   
   return `📊 Stats:\nTeam Goals: ${goalScorers.size > 0 ? Array.from(goalScorers.values()).reduce((a, b) => a + b) : 0}\nOpposition Goals: ${oppositionGoals}\nTop Scorers: ${topScorers}\nTop Assists: ${topAssists}`;
 }
+
 // Share to WhatsApp function
 function shareToWhatsApp() {
   if (STATE.data.length === 0) {
@@ -407,8 +464,8 @@ function getEventCardClass(eventType) {
   switch(eventType) {
     case 'Half Time':
     case 'Full Time':
-      return 'border-primary border-2';
-    case 'Foul':
+      return 'border-secondary border-2';
+    case 'Incident':
     case 'Penalty':
       return 'border-warning border-2';
     default:
@@ -423,7 +480,7 @@ function getEventIcon(eventType) {
     case 'Full Time':
       return '🏁';
     case 'Foul':
-      return '🟨';
+      return '⚠️';
     case 'Penalty':
       return '⚠️';
     default:
@@ -464,6 +521,9 @@ function showNotification(message, type = 'success') {
     }
   }, 2300);
 }
+
+
+
 
 // Initialize application
 function initializeApp() {
