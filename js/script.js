@@ -203,7 +203,13 @@ function addMatchEvent(eventType) {
     type: eventType,
     rawTime: currentSeconds
   };
+  if (eventType === 'Incident' || eventType === 'Penalty') {
+  showNotification(`${eventType} recorded`, 'warning');
+  }
+  else {
   showNotification(`${eventType} recorded`, 'info');
+  }
+
   STATE.matchEvents.push(eventData);
   updateLog();
   Storage.save(STORAGE_KEYS.MATCH_EVENTS, STATE.matchEvents);
@@ -222,20 +228,20 @@ function updateLog() {
   const goalEntries = STATE.data.map((event, index) => ({
     ...event,
     originalIndex: index,
-    type: 'goal'
+    updatetype: 'goal'
   }));
   
   const eventEntries = STATE.matchEvents.map((event, index) => ({
     ...event,
     originalIndex: index,
-    type: 'matchEvent'
+    updatetype: 'matchEvent'
   }));
 
 
-  const allEvents = [...STATE.data, ...STATE.matchEvents]
+  const allEvents = [...goalEntries, ...eventEntries]
     .sort((a, b) => a.rawTime - b.rawTime)
     .map(event => {
-      if (event.type) {
+      if (event.updatetype === 'matchEvent') {
         // Match event
         const cardClass = getEventCardClass(event.type);
         const icon = getEventIcon(event.type);
@@ -300,7 +306,7 @@ function deleteLogEntry(index, type) {
   }
   
   updateLog();
-  showNotification('Entry deleted', 'info');
+  showNotification('Entry deleted', 'danger');
 }
 
 //Update Score Board Scores
