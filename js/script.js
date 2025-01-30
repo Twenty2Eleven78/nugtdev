@@ -117,6 +117,7 @@ function startStopwatch() {
   timeSpan.className = 'timer-badge';
   timeSpan.textContent = formatTime(currentSeconds);
   startPauseButton.appendChild(timeSpan);
+  showNotification('Game Started!', 'success');
   } else {
     //Change running style
     startPauseButton.classList.remove('btn-sucess');
@@ -133,6 +134,7 @@ function startStopwatch() {
     STATE.isRunning = false;
     STATE.seconds = getCurrentSeconds();
     STATE.startTimestamp = null;
+    showNotification('Game Paused', 'danger');
   }
   // save state
   Storage.save(STORAGE_KEYS.IS_RUNNING, STATE.isRunning);
@@ -161,7 +163,7 @@ function addGoal(event) {
   
   // update scoreboard
    updateScoreBoard('first');
-  
+   showNotification(`Goal scored by ${goalScorerName}!`, 'success');
   //Save to storage
   Storage.save(STORAGE_KEYS.GOALS, STATE.data);
     
@@ -185,7 +187,7 @@ function opaddGoal() {
 
 // update scoreboard
 updateScoreBoard('second');
-
+showNotification(`Goal scored by ${team2Name}!`, 'danger');
   //save to storage
   Storage.save(STORAGE_KEYS.GOALS, STATE.data);
   
@@ -201,7 +203,7 @@ function addMatchEvent(eventType) {
     type: eventType,
     rawTime: currentSeconds
   };
-  
+  showNotification(`${eventType} recorded`, 'info');
   STATE.matchEvents.push(eventData);
   updateLog();
   Storage.save(STORAGE_KEYS.MATCH_EVENTS, STATE.matchEvents);
@@ -277,6 +279,7 @@ function updatefixtureTeams(team,teamName) {
     const team2Input = document.getElementById('team2Name');
     if (team2Input) team2Input.placeholder = teamName;
   }
+  showNotification(`Team name updated to ${teamName}`, 'success');
 }
 
 // Reset the tracker
@@ -426,6 +429,26 @@ function getEventIcon(eventType) {
     default:
       return '📝';
   }
+}
+
+// notification helper
+function showNotification(message, type = 'success') {
+  const container = document.getElementById('notification-container');
+  const notification = document.createElement('div');
+  notification.className = `notification ${type}`;
+  notification.textContent = message;
+  
+  container.appendChild(notification);
+  
+  // Trigger fade out
+  setTimeout(() => {
+    notification.style.opacity = '0';
+  }, 2000);
+  
+  // Remove the element after animation
+  setTimeout(() => {
+    container.removeChild(notification);
+  }, 2600);
 }
 
 // Initialize application
