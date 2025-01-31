@@ -130,3 +130,7 @@ body {
 .notification.info {
   background-color: #6c757d;
 }
+
+select>option {
+  background-color: #b8e1ba;
+}
