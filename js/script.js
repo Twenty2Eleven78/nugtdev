@@ -203,6 +203,15 @@ function addMatchEvent(eventType) {
     type: eventType,
     rawTime: currentSeconds
   };
+
+  if (eventType === 'Half Time') {
+    const team1Score = elements.firstScoreElement.textContent;
+    const team2Score = elements.secondScoreElement.textContent;
+    const team1Name = elements.Team1NameElement.textContent;
+    const team2Name = elements.Team2NameElement.textContent;
+    eventData.score = `${team1Name} ${team1Score} - ${team2Score} ${team2Name}`;
+  }
+
   if (eventType === 'Incident' || eventType === 'Penalty') {
   showNotification(`${eventType} recorded`, 'warning');
   }
@@ -214,7 +223,6 @@ function addMatchEvent(eventType) {
   updateLog();
   Storage.save(STORAGE_KEYS.MATCH_EVENTS, STATE.matchEvents);
 }
-
 
 function closeGoalModal() {
   document.getElementById('goalModalClose').click();
@@ -245,10 +253,11 @@ function updateLog() {
         // Match event
         const cardClass = getEventCardClass(event.type);
         const icon = getEventIcon(event.type);
+        const scoreInfo = event.score ? ` (${event.score})` : '';
         return `<div class="card mb-2 ${cardClass}">
           <div class="card-body p-2 d-flex justify-content-between align-items-center">
             <div>
-              <span>${event.timestamp}'</span> - ${icon} <strong>${event.type}</strong>
+              <span>${event.timestamp}'</span> - ${icon} <strong>${event.type}</strong>${scoreInfo}
             </div>
             <button class="btn btn-sm btn-outline-danger" 
               onclick="deleteLogEntry(${event.originalIndex}, 'event')" 
