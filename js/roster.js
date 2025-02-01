@@ -56,10 +56,9 @@ const RosterManager = (function() {
         const currentGoalAssist = goalAssistSelect.value;
 
         // Clear existing options
-        goalScorerSelect.innerHTML = '<option value="">Select goal scorer</option>';
-        goalScorerSelect.innerHTML = '<option value="">Own Goal</option>';
-        goalAssistSelect.innerHTML = '<option value="">Select goal assist</option>';
-        goalAssistSelect.innerHTML += '<option value="N/A">N/A</option>';
+        //goalScorerSelect.innerHTML = '<option value="">Select goal scorer</option>';
+       // goalAssistSelect.innerHTML = '<option value="">Select goal assist</option>';
+       // goalAssistSelect.innerHTML += '<option value="N/A">N/A</option>';
 
         // Add roster options
         roster.forEach(player => {
