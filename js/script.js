@@ -6,6 +6,8 @@ const STATE = {
   data: [],
   startTimestamp: null,
   matchEvents: [],
+  gameTime: 3600, // Default 60 minutes in seconds
+  isSecondHalf: false
 };
  
 // DOM Elements
@@ -27,7 +29,8 @@ const elements = {
   team1Input: document.getElementById('team1Name'),
   team2Input: document.getElementById('team2Name'),
   updTeam1Btn: document.getElementById('updTeam1Btn'),
-  updTeam2Btn: document.getElementById('updTeam2Btn')
+  updTeam2Btn: document.getElementById('updTeam2Btn'),
+  gameTimeSelect: document.getElementById('gameTimeSelect')
 };
 
 // Constants
@@ -40,7 +43,9 @@ const STORAGE_KEYS = {
   SECOND_SCORE: 'goalTracker_secondScore',
   TEAM1_NAME: 'goalTracker_team1name',    
   TEAM2_NAME: 'goalTracker_team2name',
-  MATCH_EVENTS: 'goalTracker_matchEvents'    
+  MATCH_EVENTS: 'goalTracker_matchEvents',
+  GAME_TIME: 'goalTracker_gameTime',
+  IS_SECOND_HALF: 'goalTracker_isSecondHalf'    
 };
 
 // Local Storage utilities
@@ -87,6 +92,7 @@ function getCurrentSeconds() {
 
 //update stopwatch display
 function updateStopwatchDisplay() {
+
   const currentSeconds = getCurrentSeconds();
   const existingTimeDisplay = startPauseButton.querySelector('#stopwatch');
     if (existingTimeDisplay) {
@@ -142,6 +148,151 @@ function startStopwatch() {
   Storage.save(STORAGE_KEYS.ELAPSED_TIME, STATE.seconds);
 }
 
+// Add game time change handler
+function handleGameTimeChange(event) {
+  const newGameTime = parseInt(event.target.value);
+  STATE.gameTime = newGameTime;
+  Storage.save(STORAGE_KEYS.GAME_TIME, newGameTime);
+  
+  // If game hasn't started, reset stopwatch display
+  if (!STATE.isRunning && STATE.seconds === 0) {
+    updateStopwatchDisplay();
+  }
+}
+
+// Add new function to handle half time transition
+function handleHalfTime() {
+  const halfTimeSeconds = STATE.gameTime / 2;
+  
+  // Stop the timer if it's running
+  if (STATE.isRunning) {
+    clearInterval(STATE.intervalId);
+    STATE.isRunning = false;
+  }
+    // Update UI
+    startPauseButton.classList.remove('btn-success');
+    startPauseButton.classList.add('btn-danger');
+    startPauseButton.textContent = 'Half Time Break';
+    const timeSpan = document.createElement('span');
+    timeSpan.id = 'stopwatch';
+    timeSpan.className = 'timer-badge';
+    timeSpan.textContent = formatTime(halfTimeSeconds);
+    startPauseButton.appendChild(timeSpan);
+    clearInterval(STATE.intervalId);
+    
+  // Update state
+  STATE.isRunning = false;
+  STATE.isSecondHalf = true;
+  STATE.seconds = halfTimeSeconds;
+  STATE.startTimestamp = null;
+  
+  // Save state
+  Storage.save(STORAGE_KEYS.IS_RUNNING, false);
+  Storage.save(STORAGE_KEYS.IS_SECOND_HALF, true);
+  Storage.save(STORAGE_KEYS.START_TIMESTAMP, null);
+  Storage.save(STORAGE_KEYS.ELAPSED_TIME, STATE.seconds);
+  
+  // Update display
+  updateStopwatchDisplay();
+  showNotification('Half Time - Game Paused', 'info');
+}
+
+// Add new function to handle half time transition
+function handleFullTime() {
+    
+  // Stop the timer if it's running
+  if (STATE.isRunning) {
+    clearInterval(STATE.intervalId);
+    STATE.isRunning = false;
+    
+  }
+    // Update UI
+    startPauseButton.classList.remove('btn-success');
+    startPauseButton.classList.add('btn-danger');
+    startPauseButton.textContent = 'Full Time';
+    const timeSpan = document.createElement('span');
+    timeSpan.id = 'stopwatch';
+    timeSpan.className = 'timer-badge';
+    startPauseButton.appendChild(timeSpan);
+    clearInterval(STATE.intervalId);
+    STATE.startTimestamp = null;
+ 
+  // Save state
+  Storage.save(STORAGE_KEYS.IS_RUNNING, false);
+  Storage.save(STORAGE_KEYS.START_TIMESTAMP, null);
+  Storage.save(STORAGE_KEYS.ELAPSED_TIME, STATE.seconds);
+  
+  // Update display
+  updateStopwatchDisplay();
+  showNotification('Full Time - Game Finished', 'info');
+}
+
+// Add helper function to format match time
+function formatMatchTime(seconds) {
+  const halfTime = STATE.gameTime / 2;
+  const isExtraTime = seconds > halfTime && !STATE.isSecondHalf || seconds > STATE.gameTime;
+  
+  if (!isExtraTime) {
+    return Math.ceil(seconds / 60).toString();
+  }
+  
+  // Calculate extra time
+  let baseTime, extraMinutes;
+  if (!STATE.isSecondHalf) {
+    // First half extra time
+    baseTime = halfTime/60;
+    extraMinutes = Math.ceil((seconds - halfTime) / 60);
+  } else {
+    // Second half extra time
+    baseTime = STATE.gameTime/60;
+    extraMinutes = Math.ceil((seconds - STATE.gameTime) / 60);
+  }
+  
+  return `${baseTime}+${extraMinutes}`;
+}
+
+// Add event handlers
+function addMatchEvent(eventType) {
+  const currentSeconds = getCurrentSeconds();
+  const eventData = {
+    timestamp: formatMatchTime(currentSeconds), // Use new format
+    type: eventType,
+    rawTime: currentSeconds
+  };
+
+  if (eventType === 'Half Time') {
+    const team1Score = elements.firstScoreElement.textContent;
+    const team2Score = elements.secondScoreElement.textContent;
+    const team1Name = elements.Team1NameElement.textContent;
+    const team2Name = elements.Team2NameElement.textContent;
+    eventData.score = `${team1Name} ${team1Score} - ${team2Score} ${team2Name}`;
+
+    // Handle half time transition
+    handleHalfTime();
+  }
+
+  if (eventType === 'Full Time') {
+    const team1Score = elements.firstScoreElement.textContent;
+    const team2Score = elements.secondScoreElement.textContent;
+    const team1Name = elements.Team1NameElement.textContent;
+    const team2Name = elements.Team2NameElement.textContent;
+    eventData.score = `${team1Name} ${team1Score} - ${team2Score} ${team2Name}`;
+// Handle half time transition
+    handleFullTime()
+  }
+
+  if (eventType === 'Incident' || eventType === 'Penalty') {
+  showNotification(`${eventType} recorded`, 'warning');
+  }
+  else {
+  showNotification(`${eventType} recorded`, 'info');
+  }
+
+  STATE.matchEvents.push(eventData);
+  updateLog();
+  Storage.save(STORAGE_KEYS.MATCH_EVENTS, STATE.matchEvents);
+}
+
 // Add Team Goal
 function addGoal(event) {
   event.preventDefault();
@@ -151,7 +302,7 @@ function addGoal(event) {
   const currentSeconds = getCurrentSeconds();
   
   const goalData = {
-    timestamp: Math.ceil(currentSeconds / 60),
+    timestamp: formatMatchTime(currentSeconds), // Use new format
     goalScorerName,
     goalAssistName,
     rawTime: currentSeconds
@@ -170,12 +321,13 @@ function addGoal(event) {
   // Reset form
   elements.goalForm.reset();
 }
+
 // Add Opposition Goal
 function opaddGoal() {
   const currentSeconds = getCurrentSeconds();
   const team2Name = elements.Team2NameElement.textContent;
   const opgoalData = {
-    timestamp: Math.ceil(currentSeconds / 60),
+    timestamp: formatMatchTime(currentSeconds), // Use new format
     goalScorerName: team2Name,
     goalAssistName: team2Name,
     rawTime: currentSeconds
@@ -193,35 +345,6 @@ showNotification(`Goal scored by ${team2Name}!`, 'danger');
   
     // Reset form
   elements.goalForm.reset();
-}
-
-// Add event handlers
-function addMatchEvent(eventType) {
-  const currentSeconds = getCurrentSeconds();
-  const eventData = {
-    timestamp: Math.ceil(currentSeconds / 60),
-    type: eventType,
-    rawTime: currentSeconds
-  };
-
-  if (eventType === 'Half Time') {
-    const team1Score = elements.firstScoreElement.textContent;
-    const team2Score = elements.secondScoreElement.textContent;
-    const team1Name = elements.Team1NameElement.textContent;
-    const team2Name = elements.Team2NameElement.textContent;
-    eventData.score = `${team1Name} ${team1Score} - ${team2Score} ${team2Name}`;
-  }
-
-  if (eventType === 'Incident' || eventType === 'Penalty') {
-  showNotification(`${eventType} recorded`, 'warning');
-  }
-  else {
-  showNotification(`${eventType} recorded`, 'info');
-  }
-
-  STATE.matchEvents.push(eventData);
-  updateLog();
-  Storage.save(STORAGE_KEYS.MATCH_EVENTS, STATE.matchEvents);
 }
 
 function closeGoalModal() {
@@ -361,6 +484,7 @@ function resetTracker() {
   STATE.data = [];
   STATE.startTimestamp = null;
   STATE.matchEvents = [];
+  STATE.isSecondHalf = false;
   
   // Reset UI
   updateStopwatchDisplay();
@@ -379,6 +503,7 @@ function resetTracker() {
   elements.secondScoreElement.textContent = '0';
 
   // Clear storage
+  Storage.save(STORAGE_KEYS.IS_SECOND_HALF, false);
   Storage.clear();
   //redirect to main tab
   window.location.href = "index.html";
@@ -397,7 +522,7 @@ function formatLogForWhatsApp() {
       if (event.type) {
         // Match event
         const icon = getEventIcon(event.type);
-        return `${icon} ${event.timestamp}' - ${event.type}`;
+        return `${icon} ${event.timestamp} - ${event.type}${event.score ? ` (${event.score})` : ''}`;
       } else {
         // Goal event (existing logic)
         const isOppositionGoal = event.goalScorerName === team2Name;
@@ -537,9 +662,6 @@ function showNotification(message, type = 'success') {
   }, 2300);
 }
 
-
-
-
 // Initialize application
 function initializeApp() {
 	
@@ -565,6 +687,11 @@ function initializeApp() {
   const team2Name = Storage.load(STORAGE_KEYS.TEAM2_NAME, 'Opposition Team');
   elements.Team1NameElement.textContent = team1Name;
   elements.Team2NameElement.textContent = team2Name;
+
+    // Load saved game time
+    STATE.gameTime = Storage.load(STORAGE_KEYS.GAME_TIME, 3600);
+    STATE.isSecondHalf = Storage.load(STORAGE_KEYS.IS_SECOND_HALF, false);
+    elements.gameTimeSelect.value = STATE.gameTime;
 
   // Update input placeholders
   const team1Input = document.getElementById('team1Name');
@@ -598,6 +725,7 @@ document.getElementById('HalfTimeButton').addEventListener('click', () => addMat
 document.getElementById('FullTimeButton').addEventListener('click', () => addMatchEvent('Full Time'));
 document.getElementById('IncidentButton').addEventListener('click', () => addMatchEvent('Incident'));
 document.getElementById('PenaltyButton').addEventListener('click', () => addMatchEvent('Penalty'));
+elements.gameTimeSelect.addEventListener('change', handleGameTimeChange);
 
 
   // Update Team 1 button click handler

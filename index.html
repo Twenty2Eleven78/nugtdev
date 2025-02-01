@@ -123,6 +123,16 @@
               <div class="card">
                 <div class="card-body">
                   <h5 class="card-title"><i class="fa-solid fa-gears"></i> Options</h5><hr>
+                  <div class="mb-3">
+                    <label for="gameTimeSelect" class="form-label">Game Duration:</label>
+                    <select id="gameTimeSelect" class="form-select mb-2">
+                      <option value="2400">40 minutes</option>
+                      <option value="3600" selected>60 minutes</option>
+                      <option value="4800">80 minutes</option>
+                      <option value="5400">90 minutes</option>
+                    </select>
+                    <small class="text-muted">Each half will be 50% of total time</small>
+                  </div><hr>
                   <p><button class="btn btn-danger btn-custom" data-bs-toggle="modal" data-bs-target="#rosterModal"><i class="fas fa-users"></i> My Team Management</button></p>
                   <p><button class="btn btn-success btn-custom" id="shareButton"><i class="fas fa-share-alt me-2"></i>Send WhatsApp Report</button></p> 
                   <hr> 
@@ -261,7 +271,7 @@
                   </select>
                 </div>
                 <div class="d-flex gap-2">
-                  <button type="submit" class="btn btn-success btn-custom" id="goalButton">Goal !</button>
+                  <button type="submit" class="btn btn-success btn-custom" id="goalButton">Goal</button>
                 </div>
               </form>
             </div>
