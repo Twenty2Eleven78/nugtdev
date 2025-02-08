@@ -514,7 +514,7 @@ function formatLogForWhatsApp() {
   const gameTime = formatTime(STATE.seconds);
   const team1Name = elements.Team1NameElement.textContent;
   const team2Name = elements.Team2NameElement.textContent;
-  const header = `⚽ Match Summary: ${team1Name} vs ${team2Name} (Time: ${gameTime})\n\n`;
+  const header = `⚽ Match Summary: ${team1Name} vs ${team2Name}\n (Game Time: ${gameTime})\n Score: ${team1Name} (${stats.teamGoals})  - ${team2Name} (${stats.oppositionGoals}) \n\n`;
   
   const allEvents = [...STATE.data, ...STATE.matchEvents]
     .sort((a, b) => a.rawTime - b.rawTime)
@@ -534,6 +534,7 @@ function formatLogForWhatsApp() {
     .join('\n');
     
   const stats = generateStats();
+  
   return encodeURIComponent(`${header}${allEvents}\n\n${stats}`);
 }
 
