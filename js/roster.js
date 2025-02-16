@@ -26,7 +26,7 @@ const RosterManager = (function() {
   // Set a default roster if not roster is stored
   function getDefaultRoster() {
     return [
-      'Player1', 'Player2'
+      'Player1','Player2','Player3'
     ];
   }
 
@@ -55,10 +55,10 @@ const RosterManager = (function() {
         const currentGoalScorer = goalScorerSelect.value;
         const currentGoalAssist = goalAssistSelect.value;
 
-        // Clear existing options
+        // set default options
         //goalScorerSelect.innerHTML = '<option value="">Select goal scorer</option>';
-       // goalAssistSelect.innerHTML = '<option value="">Select goal assist</option>';
-       // goalAssistSelect.innerHTML += '<option value="N/A">N/A</option>';
+        //goalAssistSelect.innerHTML = '<option value="">Select goal assist</option>';
+        //goalAssistSelect.innerHTML += '<option value="N/A">N/A</option>';
 
         // Add roster options
         roster.forEach(player => {
@@ -73,10 +73,6 @@ const RosterManager = (function() {
         if (currentGoalAssist && (currentGoalAssist === 'N/A' || roster.includes(currentGoalAssist))) {
           goalAssistSelect.value = currentGoalAssist;
         }
-
-        // Reinitialize Materialize selects
-        // M.FormSelect.init(goalScorerSelect);
-        // M.FormSelect.init(goalAssistSelect);
       }
     },
 
@@ -89,7 +85,7 @@ const RosterManager = (function() {
             <tr>
               <td>${player}</td>
               <td>
-                <button class="btn btn-sm btn-outline-danger remove-player" data-player="${player}">
+                 <button class="btn btn-sm btn-outline-danger remove-player" data-player="${player}">
                   <i class="fas fa-trash"></i> Remove
                 </button>
               </td>

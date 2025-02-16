@@ -13,6 +13,23 @@
   <!-- PWA Manifest-->
   <link rel="manifest" href="manifest.json">
   <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
+  <!-- Service Worker Invoked -->
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker
+          .register("sw.js", {
+        scope: "./"
+        })
+          .then((registration) => {
+            console.log("Service Worker registered:", registration);
+          })
+          .catch((error) => {
+            console.error("Service Worker registration failed:", error);
+          });
+      });
+    }
+  </script>
 </head>
 <body>
   <!-- Main Container -->
@@ -24,7 +41,7 @@
 
     <!-- Main Content Container-->
     <div class="container-fluid px-4 py-3">
-        <div class="content-width">
+      <div class="content-width">
         <!-- Header -->
         <div class="row mb-3">
           <div class="col-12">
@@ -81,12 +98,12 @@
                       <div class="row g-2 mb-3">
                         <div class="col-6">
                           <button id="goalButton" class="btn btn-success w-100" data-bs-toggle="modal" data-bs-target="#goalModal">
-                            <i class="fa-solid fa-futbol me-2"></i>Netherton
+                            <i class="fa-solid fa-futbol me-2"></i>Team1
                           </button>
                         </div>
                         <div class="col-6">
                           <button id="opgoalButton" class="btn btn-danger w-100" type="button">
-                            <i class="fa-solid fa-futbol me-2"></i>Opposition
+                            <i class="fa-solid fa-futbol me-2"></i>Team2
                           </button>
                         </div>
                       </div>
@@ -134,30 +151,78 @@
             <!-- Options Tab Content -->
             <div class="tab-pane fade" id="optionstab">
               <div class="card">
-                <div class="card-body">
+                <div class="card-body p-3">
                   <h5 class="card-title"><i class="fa-solid fa-gears"></i> Options</h5><hr>
-                  <div class="mb-3">
-                    <label for="gameTimeSelect" class="form-label"><h5>Game Duration:</h5></label>
-                    <select id="gameTimeSelect" class="form-select mb-2">
-                      <option value="2400">40 minutes</option>
-                      <option value="3600" selected>60 minutes</option>
-                      <option value="4800">80 minutes</option>
-                      <option value="5400">90 minutes</option>
-                    </select>
-                    <small class="text-muted">Each half will be 50% of total time</small>
-                  </div><hr>
-                  <p><button class="btn btn-danger btn-custom" data-bs-toggle="modal" data-bs-target="#rosterModal"><i class="fas fa-users"></i> My Team Management</button></p>
-                  <p><button class="btn btn-success btn-custom" id="shareButton"><i class="fas fa-share-alt me-2"></i>Send WhatsApp Report</button></p> 
+                   <!-- Game Duration Section -->
+                    <div class="mb-4">
+                      <label for="gameTimeSelect" class="form-label fw-bold mb-2">
+                         Game Duration
+                      </label>
+                      <select id="gameTimeSelect" class="form-select mb-2">
+                        <option value="2400">40 minutes</option>
+                        <option value="3600" selected>60 minutes</option>
+                        <option value="4800">80 minutes</option>
+                        <option value="5400">90 minutes</option>
+                      </select>
+                      <small class="text-muted d-block mb-2">Each half will be 50% of total time</small>
+                    </div>
+                    <hr>
+                  <!-- Team Management Section -->
+                  <div class="d-grid gap-3 mb-4">
+                    <button class="btn btn-danger d-flex align-items-center justify-content-center py-2" 
+                      data-bs-toggle="modal" 
+                      data-bs-target="#rosterModal">
+                      <i class="fas fa-users me-2"></i>
+                      My Team Management
+                    </button>
+  
+                    <button class="btn btn-success d-flex align-items-center justify-content-center py-2" 
+                      id="shareButton">
+                      <i class="fas fa-share-alt me-2"></i>
+                      Send WhatsApp Report
+                    </button>
+                  </div>
                   <hr> 
-                  <p><button class="btn btn-danger btn-custom" data-bs-toggle="modal" data-bs-target="#releasenotesmodal"><i class="fa-solid fa-list"></i> Release Notes</button>
-                  <p><button class="btn btn-danger btn-custom" data-bs-toggle="modal" data-bs-target="#resetConfirmModal"><i class="fa-solid fa-arrows-rotate"></i> Reset GameTime App</button></p> 
+                  <!-- App Management Section -->
+                  <div class="d-grid gap-3">
+                    <button class="btn btn-danger d-flex align-items-center justify-content-center py-2" 
+                            data-bs-toggle="modal" 
+                            data-bs-target="#releasenotesmodal">
+                      <i class="fa-solid fa-list me-2"></i>
+                      Release Notes
+                    </button>
+                    
+                    <button class="btn btn-danger d-flex align-items-center justify-content-center py-2" 
+                            data-bs-toggle="modal" 
+                            data-bs-target="#resetConfirmModal">
+                      <i class="fa-solid fa-arrows-rotate me-2"></i>
+                      Reset GameTime App
+                    </button>
+                  </div>
+                  <hr>
+                  <!-- Donate Section -->
+                  <div class="d-grid">
+                    <button class="btn btn-warning d-flex align-items-center justify-content-center py-2" 
+                      id="donateButton"
+                      data-bs-toggle="modal" 
+                      data-bs-target="#donateModal">
+                      <i class="fa-solid fa-heart me-2"></i>
+                      Coming Soon.... Support Netherton U12 Girls Black
+                    </button>
+                    <small class="text-muted text-center mt-2">Help Support Our Girls !</small>
+                  </div>
                 </div>
               </div>
             </div>
+            <!--END Options Tab Content-->
+
           </div>
         </div>
+        <!--END Tab Content-->
+
       </div>
     </div>
+    <!-- END Main Content Container -->
   </div>
   <!-- END MAIN CONTAINER -->
 
@@ -378,6 +443,65 @@
   </div>
 </div>
 <!--END Confirm Reset Modal-->
+
+<!--Donate Modal -->
+<div class="modal fade" id="donateModal" tabindex="-1" aria-labelledby="donateModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h5 class="modal-title" id="donateModalLabel">
+          <i class="fa-solid fa-heart text-danger me-2"></i>Support Netherton U12 Girls Black
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      
+      <!-- Modal Body -->
+      <div class="modal-body">
+        <div class="text-center mb-4">
+          <h6 class="mb-3">Thank you for considering supporting<br>Netherton United U12 Girls Football Team!</h6>
+          <p class="text-muted">Your support helps our girls both on and off the pitch encouraging teamwork, responsability, confidence, passion and overcoming adversity.</p>
+        </div>
+
+        <!-- Donation Options -->
+        <div class="d-grid gap-3">
+          <!-- PayPal Button -->
+          <div class="text-center">
+            Donate Option Coming Soon.....
+          </div>
+
+          <!-- Divider -->
+          <div class="text-center">
+            <span class="text-muted">or</span>
+          </div>
+
+          <!-- GoFundMe Button -->
+          <div class="text-center">
+            Donate Option Coming Soon.....
+          </div>
+        </div>
+
+        <!-- Additional Information -->
+        <div class="text-left mt-4">
+          <p class="text-muted small mb-0">All donations go directly towards:</p>
+          <ul class=" text-muted small">
+            <br>
+            <li>Equipment for the team</li>
+            <li>Veo Cam fund and subscriptions to help with future game development</li>
+            <li>Kit updates alongside our main Sponsors, <b>Flagship Partners</b> and <b>Resource Engineering Supplies</b> </li>
+          </ul>
+        </div>
+      </div>
+      
+      <!-- Modal Footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--ENd Donate Modal-->
 
 <!-- Scripts -->
 <script src="js/bootstrap.bundle.min.js"></script>

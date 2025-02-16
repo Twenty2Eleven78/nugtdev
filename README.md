@@ -7,5 +7,5 @@
 <li>2.0 - Added Roster/team Management feature</li>
 <li>2.1 - General application ui and function improvements</li>
 <li>2.11 - Added time rounding (round up) to Goal Log</li>
-<li>3.0 - UI Overhall, ScoreBoard, Nav Pills, Modals, Fixture Management</li>
+<li><b>3.0 - UI Overhall, ScoreBoard, Nav Pills, Modals, Fixture Management</b></li>
 <li><b>3.1 - New Match Events options and Events data, ability to delete individual logs</b></li>
