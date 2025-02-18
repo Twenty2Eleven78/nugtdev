@@ -7,7 +7,7 @@ const STATE = {
   startTimestamp: null,
   matchEvents: [],
   gameTime: 3600, // Default 60 minutes in seconds
-  isSecondHalf: false
+  isSecondHalf: false,
 };
  
 // DOM Elements
@@ -35,17 +35,17 @@ const elements = {
 
 // Constants
 const STORAGE_KEYS = {
-  START_TIMESTAMP: 'goalTracker_startTimestamp',
-  IS_RUNNING: 'goalTracker_isRunning',
-  GOALS: 'goalTracker_goals',
-  ELAPSED_TIME: 'goalTracker_elapsedTime',
-  FIRST_SCORE: 'goalTracker_firstScore',    
-  SECOND_SCORE: 'goalTracker_secondScore',
-  TEAM1_NAME: 'goalTracker_team1name',    
-  TEAM2_NAME: 'goalTracker_team2name',
-  MATCH_EVENTS: 'goalTracker_matchEvents',
-  GAME_TIME: 'goalTracker_gameTime',
-  IS_SECOND_HALF: 'goalTracker_isSecondHalf'    
+  START_TIMESTAMP: 'nugt_startTimestamp',
+  IS_RUNNING: 'nugt_isRunning',
+  GOALS: 'nugt_goals',
+  ELAPSED_TIME: 'nugt_elapsedTime',
+  FIRST_SCORE: 'nugt_firstScore',    
+  SECOND_SCORE: 'nugt_secondScore',
+  TEAM1_NAME: 'nugt_team1name',    
+  TEAM2_NAME: 'nugt_team2name',
+  MATCH_EVENTS: 'nugt_matchEvents',
+  GAME_TIME: 'nugt_gameTime',
+  IS_SECOND_HALF: 'nugt_isSecondHalf'     
 };
 
 // Local Storage utilities
@@ -693,6 +693,31 @@ function showNotification(message, type = 'success') {
   }, 2300);
 }
 
+// Handle URL parameters for notifications
+function handleRedirectParams() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const feedbackStatus = urlParams.get('feedback');
+  
+  if (feedbackStatus === 'success') {
+      showNotification('Thank you for your feedback! Your form has been sent.', 'success');
+      
+      // Close the modal if it's still open
+      const feedbackModal = bootstrap.Modal.getInstance(document.getElementById('feedbackModal'));
+      if (feedbackModal) {
+          feedbackModal.hide();
+      }
+      
+      // Reset the form
+      const feedbackForm = document.getElementById('feedbackForm');
+      if (feedbackForm) {
+          feedbackForm.reset();
+      }
+  }
+  
+  // Clean up URL after showing notification
+  window.history.replaceState({}, document.title, window.location.pathname);
+}
+
 // Initialize application
 function initializeApp() {
 	
@@ -715,13 +740,15 @@ function initializeApp() {
 
   // Load saved team names
   const team1Name = Storage.load(STORAGE_KEYS.TEAM1_NAME, 'Netherton');
-  const team2Name = Storage.load(STORAGE_KEYS.TEAM2_NAME, 'Opposition Team');
+  const team2Name = Storage.load(STORAGE_KEYS.TEAM2_NAME, 'Opposition');
   elements.Team1NameElement.textContent = team1Name;
   elements.Team2NameElement.textContent = team2Name;
   const icon = elements.opgoalButton.querySelector('i')
 
-  elements.goalButton.innerHTML = icon.outerHTML + "Goal " + team1Name;
-  elements.opgoalButton.innerHTML = icon.outerHTML + "Goal " + team2Name;
+ //elements.goalButton.innerHTML = icon.outerHTML + "GOAL " + team1Name;
+ //elements.opgoalButton.innerHTML = icon.outerHTML + "GOAL " + team2Name;
+  elements.goalButton.innerHTML =  "GOAL " + team1Name;
+  elements.opgoalButton.innerHTML =  "GOAL " + team2Name;
 
     // Load saved game time
     STATE.gameTime = Storage.load(STORAGE_KEYS.GAME_TIME, 3600);
@@ -762,7 +789,6 @@ document.getElementById('IncidentButton').addEventListener('click', () => addMat
 document.getElementById('PenaltyButton').addEventListener('click', () => addMatchEvent('Penalty'));
 elements.gameTimeSelect.addEventListener('change', handleGameTimeChange);
 
-
   // Update Team 1 button click handler
   elements.updTeam1Btn.addEventListener('click', () => {
     const newTeamName = elements.team1Input.value.trim();
@@ -786,5 +812,22 @@ elements.gameTimeSelect.addEventListener('change', handleGameTimeChange);
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden && STATE.isRunning) {
     updateStopwatchDisplay();
+  }
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Check for redirect parameters
+  handleRedirectParams();
+  
+  // Set up the _next URL dynamically
+  const feedbackForm = document.querySelector('#feedbackModal form');
+  if (feedbackForm) {
+      const nextInput = feedbackForm.querySelector('input[name="_next"]');
+      if (nextInput) {
+          // Get the current URL and add the success parameter
+          const currentUrl = new URL(window.location.href);
+          currentUrl.searchParams.set('feedback', 'success');
+          nextInput.value = currentUrl.toString();
+      }
   }
 });
