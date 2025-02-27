@@ -1,3 +1,20 @@
+/**
+ * Netherton United Game Time App (NUGT)
+ * 
+ * @description A web application for tracking football match events, goals, and statistics
+ * @version 3.2.0
+ * @author Mark Van-Kerro
+ * @date Last Updated: 2025-02-27
+ * 
+ * This script handles all the functionality for the game time application including:
+ * - Match timer management
+ * - Goal tracking and statistics
+ * - Match event logging
+ * - Team management
+ * - Data persistence using localStorage
+ * - WhatsApp sharing functionality
+ */
+
 // State management
 const STATE = {
   seconds: 0,
@@ -258,18 +275,30 @@ function formatMatchTime(seconds) {
 // Add event handlers
 function addMatchEvent(eventType) {
   const currentSeconds = getCurrentSeconds();
+  const team1Name = elements.Team1NameElement.textContent;
+  const team2Name = elements.Team2NameElement.textContent;
+
   const eventData = {
     timestamp: formatMatchTime(currentSeconds), // Use new format
     type: eventType,
     rawTime: currentSeconds
   };
 
+ // Determine if this event is related to a specific team
+ if (eventType.includes(team1Name)) {
+  eventData.team = 1;
+  eventData.teamName = team1Name;
+ } else if (eventType.includes(team2Name)) {
+  eventData.team = 2;
+  eventData.teamName = team2Name;
+ }
+
   if (eventType === 'Half Time') {
     const team1Score = elements.firstScoreElement.textContent;
     const team2Score = elements.secondScoreElement.textContent;
-    const team1Name = elements.Team1NameElement.textContent;
-    const team2Name = elements.Team2NameElement.textContent;
     eventData.score = `${team1Name} ${team1Score} - ${team2Score} ${team2Name}`;
+    eventData.team1Name = team1Name;
+    eventData.team2Name = team2Name;
 
     // Handle half time transition
     handleHalfTime();
@@ -278,10 +307,10 @@ function addMatchEvent(eventType) {
   if (eventType === 'Full Time') {
     const team1Score = elements.firstScoreElement.textContent;
     const team2Score = elements.secondScoreElement.textContent;
-    const team1Name = elements.Team1NameElement.textContent;
-    const team2Name = elements.Team2NameElement.textContent;
     eventData.score = `${team1Name} ${team1Score} - ${team2Score} ${team2Name}`;
-// Handle half time transition
+    eventData.team1Name = team1Name;
+    eventData.team2Name = team2Name;
+    // Handle half time transition
     handleFullTime()
   }
 
@@ -304,12 +333,15 @@ function addGoal(event) {
   const goalScorerName = elements.goalScorer.value;
   const goalAssistName = elements.goalAssist.value;
   const currentSeconds = getCurrentSeconds();
+  const team1Name = elements.Team1NameElement.textContent;
   
   const goalData = {
     timestamp: formatMatchTime(currentSeconds), // Use new format
     goalScorerName,
     goalAssistName,
-    rawTime: currentSeconds
+    rawTime: currentSeconds,
+    team: 1, // Indicate this is a team 1 goal
+    teamName: team1Name // Store the current team name
   };
   
   //update log
@@ -334,7 +366,9 @@ function opaddGoal() {
     timestamp: formatMatchTime(currentSeconds), // Use new format
     goalScorerName: team2Name,
     goalAssistName: team2Name,
-    rawTime: currentSeconds
+    rawTime: currentSeconds,
+    team: 2, // Indicate this is a team 2 goal
+    teamName: team2Name // Store the current team name
   };
   
   //update log
@@ -351,76 +385,141 @@ showNotification(`Goal scored by ${team2Name}!`, 'danger');
   elements.goalForm.reset();
 }
 
+// Goal Modal Auto close
 function closeGoalModal() {
   document.getElementById('goalModalClose').click();
   return false;
 }
 
-// Update Goal Log
+// Update Match Event Log
 function updateLog() {
 
-  // Create separate arrays for each type with their original indices
-  const goalEntries = STATE.data.map((event, index) => ({
-    ...event,
-    originalIndex: index,
-    updatetype: 'goal'
-  }));
-  
-  const eventEntries = STATE.matchEvents.map((event, index) => ({
-    ...event,
-    originalIndex: index,
-    updatetype: 'matchEvent'
-  }));
+  // Get current team names
+  const currentTeam1Name = elements.Team1NameElement.textContent;
+  const currentTeam2Name = elements.Team2NameElement.textContent;
 
+  // Create a single array with all events at once
+  const allEvents = [
+    ...STATE.data.map((event, index) => ({
+      ...event,
+      originalIndex: index,
+      updatetype: 'goal'
+    })),
+    ...STATE.matchEvents.map((event, index) => ({
+      ...event,
+      originalIndex: index,
+      updatetype: 'matchEvent'
+    }))
+  ].sort((a, b) => a.rawTime - b.rawTime);
 
-  const allEvents = [...goalEntries, ...eventEntries]
-    .sort((a, b) => a.rawTime - b.rawTime)
-    .map(event => {
-      if (event.updatetype === 'matchEvent') {
-        // Match event
-        const cardClass = getEventCardClass(event.type);
-        const icon = getEventIcon(event.type);
-        const scoreInfo = event.score ? ` (${event.score})` : '';
-        return `<div class="card mb-2 ${cardClass}">
-          <div class="card-body p-2 d-flex justify-content-between align-items-center">
-            <div>
-              <span>${event.timestamp}'</span> - ${icon} <strong>${event.type}</strong>${scoreInfo}
-            </div>
-            <button class="btn btn-sm btn-outline-danger" 
-              onclick="deleteLogEntry(${event.originalIndex}, 'event')" 
-              aria-label="Delete event">
-              <i class="fas fa-trash"></i>
-            </button>
-          </div>
-        </div>`;
-      } else {
-        // Goal event (existing logic)
-        const team2Name = elements.Team2NameElement.textContent;
-        const isOppositionGoal = event.goalScorerName === team2Name || event.goalScorerName === 'Opposition Team';
-        const cardClass = isOppositionGoal ? 'border-danger border-2' : 'border-success border-2';
-        
-        return `<div class="card mb-2 ${cardClass}">
-          <div class="card-body p-2 d-flex justify-content-between align-items-center">
-            <div>
-              <span>${event.timestamp}'</span> - 
-              <strong>${isOppositionGoal ? `<font color="red"> ${team2Name} Goal</font>` : 'Goal:'}</strong>
-              ${isOppositionGoal ? '' : ` ${event.goalScorerName}, <strong>Assist:</strong> ${event.goalAssistName}`}
-            </div>
-            <button class="btn btn-sm btn-outline-danger" 
-              onclick="deleteLogEntry(${event.originalIndex}, 'goal')" 
-              aria-label="Delete goal">
-              <i class="fas fa-trash"></i>
-            </button>
-          </div>
-        </div>`;
-      }
-    })
-    .join('');
+  // Check if there are any events
+  if (allEvents.length === 0) {
+    elements.log.innerHTML = `
+     <div class="empty-timeline-message">
+       <div class="text-center p-4">
+         <i class="fas fa-clipboard-list fa-3x text-muted mb-3"></i>
+         <h5>No events recorded yet</h5>
+         <p class="text-muted">
+           Match events and goals will appear here as they happen.
+         </p>
+       </div>
+      </div>
+    `;
+    return;
+  }
+
+  // Use DocumentFragment for better performance when building DOM
+  const fragment = document.createDocumentFragment();
+  const timelineContainer = document.createElement('div');
+  timelineContainer.className = 'timeline';
+
+  allEvents.forEach((event, index) => {
+    const timelineItemClass = index % 2 === 0 ? 'timeline-item-left' : 'timeline-item-right';
+    const item = document.createElement('div');
+    item.className = `timeline-item ${timelineItemClass}`;
     
-  elements.log.innerHTML = allEvents;
+    if (event.updatetype === 'matchEvent') {
+      // Match event
+      const cardClass = getEventCardClass(event.type);
+      const icon = getEventIcon(event.type);
+      
+      // Use the stored team names if available, otherwise use current names
+      let eventText = event.type;
+      let scoreInfo = event.score ? ` (${event.score})` : '';
+
+      // If the event has team-specific information, use the stored team names
+      if (event.teamName) {
+        // Replace any occurrences of old team names with current ones
+        if (event.team === 1) {
+          eventText = event.type.replace(event.teamName, currentTeam1Name);
+        } else if (event.team === 2) {
+          eventText = event.type.replace(event.teamName, currentTeam2Name);
+        }
+      }
+      
+      // If the event has score information, update team names in the score
+      if (event.score && event.team1Name && event.team2Name) {
+        scoreInfo = ` (${event.score.replace(event.team1Name, currentTeam1Name).replace(event.team2Name, currentTeam2Name)})`;
+      }
+      
+      item.innerHTML = `
+        <div class="timeline-marker"></div>
+        <div class="timeline-content ${cardClass}">
+          <div class="timeline-time">${event.timestamp}'</div>
+          <div class="timeline-body">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>${icon} <strong>${eventText}</strong>${scoreInfo}</div>
+              <button class="btn btn-sm btn-outline-danger" 
+                onclick="deleteLogEntry(${event.originalIndex}, 'event')" 
+                aria-label="Delete event">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    } else {
+      // Goal event
+      // Use the stored team information if available
+      const goalTeam = event.team || (event.goalScorerName === currentTeam2Name ? 2 : 1);
+      const isOppositionGoal = goalTeam === 2;
+      
+      // Get the correct team name to display
+      const displayTeamName = isOppositionGoal ? currentTeam2Name : currentTeam1Name;
+      
+      const cardClass = isOppositionGoal ? 'border-danger border-2' : 'border-success border-2';
+      const markerClass = isOppositionGoal ? 'marker-danger' : 'marker-success';
+      
+      item.innerHTML = `
+        <div class="timeline-marker ${markerClass}"></div>
+        <div class="timeline-content ${cardClass}">
+          <div class="timeline-time">${event.timestamp}'</div>
+          <div class="timeline-body">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <strong>${isOppositionGoal ? `<font color="red"><i class="fa-regular fa-futbol"></i> Goal: ${displayTeamName}</font>` : `<font color="green"><i class="fa-regular fa-futbol"></i> Goal: ${displayTeamName}</font>`}</strong>
+                ${isOppositionGoal ? '' : `<br><small><strong>Scored By: </strong>${event.goalScorerName}, <strong>Assisted By:</strong> ${event.goalAssistName}</small>`}
+              </div>
+              <button class="btn btn-sm btn-outline-danger" 
+                onclick="deleteLogEntry(${event.originalIndex}, 'goal')" 
+                aria-label="Delete goal">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+    
+    timelineContainer.appendChild(item);
+  });
+  
+  fragment.appendChild(timelineContainer);
+  elements.log.innerHTML = '';
+  elements.log.appendChild(fragment);
 }
 
-//
+//Delete Log Entry
 function deleteLogEntry(index, type) {
   if (type === 'goal') {
     STATE.data.splice(index, 1);
@@ -485,6 +584,10 @@ function updatefixtureTeams(team,teamName) {
     const team2Input = document.getElementById('team2Name');
     if (team2Input) team2Input.placeholder = teamName;
   }
+
+  // Update the timeline to reflect the new team names
+  updateLog();
+
   showNotification(`Team name updated to ${teamName}`, 'success');
 }
 
@@ -613,7 +716,7 @@ function generateStats() {
     : 'None';
   
   return {
-    statsstring: `📊 Stats:\nTeam Goals: ${teamGoals}\nOpposition Goals: ${oppositionGoals}\nTop Scorers: ${topScorers}\nTop Assists: ${topAssists}`,
+    statsstring: `📊 Stats:\nTeam Goals: ${teamGoals}\nOpposition Goals: ${oppositionGoals}\n Team Top Scorers: ${topScorers}\n Team Top Assists: ${topAssists}`,
     teamGoals: teamGoals,
     oppositionGoals: oppositionGoals
   };
