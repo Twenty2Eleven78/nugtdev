@@ -52,6 +52,9 @@ const elements = {
   gameTimeSelect: document.getElementById('gameTimeSelect')
 };
 
+let editingEventIndex = null;
+let editingEventType = null;
+
 // Constants
 const STORAGE_KEYS = {
   START_TIMESTAMP: 'nugt_startTimestamp',
@@ -469,11 +472,17 @@ function updateLog() {
           <div class="timeline-body">
             <div class="d-flex justify-content-between align-items-center">
               <div>${icon} <strong>${eventText}</strong>${scoreInfo}</div>
-              <button class="btn btn-sm btn-outline-danger" 
-                onclick="deleteLogEntry(${event.originalIndex}, 'event')" 
-                aria-label="Delete event">
-                <i class="fas fa-trash"></i>
-              </button>
+              <div>
+                <button class="btn btn-sm btn-outline-primary" 
+                 onclick="openEditEventModal(${event.originalIndex}, '${event.updatetype}')">
+                 <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-danger" 
+                  onclick="deleteLogEntry(${event.originalIndex}, 'event')" 
+                  aria-label="Delete event">
+                 <i class="fas fa-trash"></i>
+                 </button>
+              </div>
             </div>
           </div>
         </div>
@@ -500,11 +509,17 @@ function updateLog() {
                 <strong>${isOppositionGoal ? `<font color="red"><i class="fa-regular fa-futbol"></i> Goal: ${displayTeamName}</font>` : `<font color="green"><i class="fa-regular fa-futbol"></i> Goal: ${displayTeamName}</font>`}</strong>
                 ${isOppositionGoal ? '' : `<br><small><strong>Scored By: </strong>${event.goalScorerName}, <strong>Assisted By:</strong> ${event.goalAssistName}</small>`}
               </div>
-              <button class="btn btn-sm btn-outline-danger" 
-                onclick="deleteLogEntry(${event.originalIndex}, 'goal')" 
-                aria-label="Delete goal">
-                <i class="fas fa-trash"></i>
-              </button>
+              <div>
+                <button class="btn btn-sm btn-outline-primary me-2" 
+                   onclick="openEditEventModal(${event.originalIndex}, '${event.updatetype}')">
+                  <i class="fas fa-edit"></i>
+                </button>
+               <button class="btn btn-sm btn-outline-danger" 
+                 onclick="deleteLogEntry(${event.originalIndex}, 'goal')" 
+                 aria-label="Delete goal">
+                 <i class="fas fa-trash"></i>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -542,6 +557,54 @@ function deleteLogEntry(index, type) {
   
   updateLog();
   showNotification('Entry deleted', 'danger');
+}
+
+// Open the Edit Event Modal
+function openEditEventModal(index, type) {
+  editingEventIndex = index;
+  editingEventType = type;
+
+  // Get the current event time
+  const event = type === 'goal' ? STATE.data[index] : STATE.matchEvents[index];
+  const currentMinutes = Math.floor(event.rawTime / 60);
+
+  // Set the current time in the modal input
+  document.getElementById('editEventTime').value = currentMinutes;
+
+  // Show the modal
+  const editEventModal = new bootstrap.Modal(document.getElementById('editEventModal'));
+  editEventModal.show();
+}
+
+function handleEditEventFormSubmission(event) {
+  event.preventDefault();
+
+  // Get the new time from the input
+  const newMinutes = parseInt(document.getElementById('editEventTime').value, 10);
+  const newRawTime = newMinutes * 60;
+
+  // Update the event time
+  if (editingEventType === 'goal') {
+    STATE.data[editingEventIndex].rawTime = newRawTime;
+    STATE.data[editingEventIndex].timestamp = formatMatchTime(newRawTime);
+  } else if (editingEventType === 'matchEvent') {
+    STATE.matchEvents[editingEventIndex].rawTime = newRawTime;
+    STATE.matchEvents[editingEventIndex].timestamp = formatMatchTime(newRawTime);
+  }
+
+  // Save the updated state to localStorage
+  Storage.save(STORAGE_KEYS.GOALS, STATE.data);
+  Storage.save(STORAGE_KEYS.MATCH_EVENTS, STATE.matchEvents);
+
+  // Re-render the log
+  updateLog();
+
+  // Hide the modal
+  const editEventModal = bootstrap.Modal.getInstance(document.getElementById('editEventModal'));
+  editEventModal.hide();
+
+  // Show a notification
+  showNotification('Event time updated successfully!', 'success');
 }
 
 //Update Score Board Scores
@@ -677,49 +740,56 @@ function generateStats() {
   let oppositionGoals = 0;
   let teamGoals = 0;
 
-  // Add a check if STATE.data is empty
-  if (STATE.data && STATE.data.length > 0) {
-    STATE.data.forEach(({ goalScorerName, goalAssistName }) => {
-      // Check if the goal scorer matches any historical team 2 name
-      if (STATE.team2History.includes(goalScorerName)) {
-        oppositionGoals++;
-      } else if (STATE.team1History.includes(goalScorerName) || goalScorerName) {
+// Add a check if STATE.data is empty
+if (STATE.data && STATE.data.length > 0) {
+  STATE.data.forEach(({ goalScorerName, goalAssistName }) => {
+    // Check if the goal scorer matches any historical team 2 name
+    if (STATE.team2History.includes(goalScorerName)) {
+      oppositionGoals++;
+    } else if (STATE.team1History.includes(goalScorerName) || goalScorerName) {
+      // Exclude 'N/A' and empty entries
+      if (goalScorerName && goalScorerName.trim() !== '' && goalScorerName !== 'N/A') {
         // Count goals for team 1 (includes goals by individual players)
         teamGoals++;
         goalScorers.set(goalScorerName, (goalScorers.get(goalScorerName) || 0) + 1);
-        if (goalAssistName) {
-          assists.set(goalAssistName, (assists.get(goalAssistName) || 0) + 1);
-        }
       }
-    });
-  }
 
-    // Get current team names for the report
-    const team1Name = elements.Team1NameElement.textContent;
-    const team2Name = elements.Team2NameElement.textContent;
+      // Handle assists, excluding 'N/A' and empty entries
+      if (goalAssistName && goalAssistName.trim() !== '' && goalAssistName !== 'N/A') {
+        assists.set(goalAssistName, (assists.get(goalAssistName) || 0) + 1);
+      }
+    }
+  });
+}
+
+  // Get current team names for the report
+  const team1Name = elements.Team1NameElement.textContent;
+  const team2Name = elements.Team2NameElement.textContent;
 
   
-  const topScorers = goalScorers.size > 0 
-    ? Array.from(goalScorers.entries())
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 3)
-        .map(([name, goals]) => `${name}: ${goals}`)
-        .join(', ')
+  // Sort goal scorers and assists by number of goals/assists in descending order
+  const sortedScorers = Array.from(goalScorers.entries())
+    .sort((a, b) => b[1] - a[1])
+    .map(([name, goals]) => `${name}: ${goals}`);
+  
+  const sortedAssists = Array.from(assists.entries())
+    .sort((a, b) => b[1] - a[1])
+    .map(([name, assistCount]) => `${name}: ${assistCount}`);
+
+  // Prepare stats string with full lists
+  const scorersString = sortedScorers.length > 0 
+    ? sortedScorers.join('\n')
     : 'None';
   
-  const topAssists = assists.size > 0
-    ? Array.from(assists.entries())
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 3)
-        .map(([name, assists]) => `${name}: ${assists}`)
-        .join(', ')
+  const assistsString = sortedAssists.length > 0
+    ? sortedAssists.join('\n')
     : 'None';
   
-  return {
-    statsstring: `📊 Stats:\nTeam Goals: ${teamGoals}\nOpposition Goals: ${oppositionGoals}\n Team Top Scorers: ${topScorers}\n Team Top Assists: ${topAssists}`,
-    teamGoals: teamGoals,
-    oppositionGoals: oppositionGoals
-  };
+    return {
+      statsstring: `📊 Stats:\nTeam Goals: ${teamGoals}\nOpposition Goals: ${oppositionGoals}\n\n🥅 Team Goal Scorers:\n${scorersString}\n\n🤝 Team Assists:\n${assistsString}`,
+      teamGoals: teamGoals,
+      oppositionGoals: oppositionGoals
+    };
 }
 
 // Share to WhatsApp function
@@ -908,6 +978,7 @@ document.getElementById('FullTimeButton').addEventListener('click', () => addMat
 document.getElementById('IncidentButton').addEventListener('click', () => addMatchEvent('Incident'));
 document.getElementById('PenaltyButton').addEventListener('click', () => addMatchEvent('Penalty'));
 elements.gameTimeSelect.addEventListener('change', handleGameTimeChange);
+document.getElementById('editEventForm').addEventListener('submit', handleEditEventFormSubmission);
 
   // Update Team 1 button click handler
   elements.updTeam1Btn.addEventListener('click', () => {

@@ -372,6 +372,28 @@
 </div>
 <!-- END Goal Modal -->
 
+<!-- Edit Event Modal -->
+<div class="modal fade" id="editEventModal" tabindex="-1" aria-labelledby="editEventModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editEventModalLabel">Edit Event Time</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="editEventForm">
+          <div class="mb-3">
+            <label for="editEventTime" class="form-label">Event Time (in minutes)</label>
+            <input type="number" class="form-control" id="editEventTime" required>
+          </div>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- END Edit Event Modal -->
+
 <!-- Roster Modal -->
   <div class="modal fade" id="rosterModal" tabindex="-1">
     <div class="modal-dialog">
@@ -464,24 +486,10 @@
           <h6 class="mb-3">Thank you for considering supporting<br>Netherton United U12 Girls Football Team!</h6>
           <p class="text-muted">Your support helps our girls both on and off the pitch encouraging teamwork, responsability, confidence, passion and overcoming adversity.</p>
         </div>
-
-        <!-- Donation Options -->
-        <div class="d-grid gap-3">
-          <!-- PayPal Button -->
-          <div class="text-center">
-            Donate Option Coming Soon.....
-          </div>
-
-          <!-- Divider -->
-          <div class="text-center">
-            <span class="text-muted">or</span>
-          </div>
-
           <!-- GoFundMe Button -->
-          <div class="text-center">
-            Donate Option Coming Soon.....
+          <div class="text-center mt-4">
+              <a href="https://gofund.me/2ba270e4" class="btn btn-danger btn-lg">Support Our Girls</a>
           </div>
-        </div>
 
         <!-- Additional Information -->
         <div class="text-left mt-4">
